@@ -28,6 +28,12 @@ Esta versão inclui as seguintes alterações e melhorias:
     - Visual mais organizado e harmônico
     - Redução de ~60% no scroll vertical necessário
     - Cores neutras alinhadas ao tema escuro
+  - **Refatoração das abas Pessoa Física e Pessoa Jurídica**:
+    - Organização por categorias em cards (Dados Pessoais/Empresa, Contatos, Endereço, Filiação/Responsável)
+    - Layout em grid responsivo para melhor aproveitamento do espaço
+    - Visual consistente com a aba Geradores de Dados
+    - Melhor leitura cognitiva com agrupamento visual claro
+    - Headers com ícones para identificação rápida das seções
 - 🎯 **Melhorias de UX**: 
   - Consistência visual entre todos os elementos
   - Remoção de efeitos hover desnecessários em campos readonly
@@ -165,20 +171,22 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 
 > **Nota**: Esta versão inclui todas as funcionalidades do projeto original, além das novas funcionalidades mencionadas acima.
 
-### 1. 👤 Gerador Pessoa Física Completa *(NOVO)*
+### 1. 👤 Gerador Pessoa Física Completa *(NOVO - Refatorado)*
 
-#### Dados Pessoais
+A aba foi refatorada com organização visual por categorias em cards, melhorando significativamente a leitura cognitiva e a localização de informações.
+
+#### 👤 Dados Pessoais
 - **Nome Completo**: Gera nome brasileiro completo com sobrenomes
 - **CPF**: Gera CPF válido com máscara (XXX.XXX.XXX-XX)
 - **RG**: Gera RG válido com máscara (XX.XXX.XXX-X)
 - **Data de Nascimento**: Gera data de nascimento aleatória (idade entre 18-80 anos)
 
-#### Contatos
+#### 📧 Contatos
 - **Email**: Gera email baseado no nome gerado
 - **Telefone**: Gera telefone fixo com DDD
 - **Celular**: Gera celular com DDD
 
-#### Endereço Completo
+#### 🏠 Endereço Completo
 - **CEP**: Gera CEP válido (XXXXX-XXX)
 - **Endereço**: Logradouro completo
 - **Número**: Número do endereço
@@ -187,7 +195,7 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 - **Cidade**: Cidade brasileira
 - **UF**: Estado correspondente
 
-#### Filiação
+#### 👨‍👩‍👧 Filiação
 - **Nome da Mãe**: Nome completo da mãe
 - **Nome do Pai**: Nome completo do pai
 
@@ -196,9 +204,17 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 - **Copiar Todos os Dados**: Copia todos os dados em formato texto
 - **Copiar como JSON**: Copia os dados em formato JSON estruturado
 
-### 2. 🏢 Gerador Pessoa Jurídica Completa *(NOVO)*
+#### 🎨 Melhorias de Layout
+- **Cards por Categoria**: Organização visual clara com 4 cards (Dados Pessoais, Contatos, Endereço, Filiação)
+- **Grid Responsivo**: Layout adaptável (2 colunas no desktop para Dados/Contatos, 1 coluna para Endereço/Filiação)
+- **Visual Consistente**: Alinhado com o padrão da aba Geradores de Dados
+- **Leitura Cognitiva**: Agrupamento visual facilita localização rápida de informações
 
-#### Dados da Empresa
+### 2. 🏢 Gerador Pessoa Jurídica Completa *(NOVO - Refatorado)*
+
+A aba foi refatorada com organização visual por categorias em cards, melhorando significativamente a leitura cognitiva e a localização de informações.
+
+#### 🏢 Dados da Empresa
 - **Razão Social**: Razão social completa com tipo e sufixo (Ltda, EIRELI, S.A., etc.)
 - **Nome Fantasia**: Nome fantasia da empresa
 - **CNPJ**: Gera CNPJ válido com máscara (XX.XXX.XXX/XXXX-XX)
@@ -207,11 +223,11 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 - **Porte**: Porte da empresa (MEI, Microempresa, Pequeno Porte, etc.)
 - **CNAE Principal**: CNAE principal da empresa
 
-#### Contatos
+#### 📧 Contatos
 - **Email Corporativo**: Email baseado no nome fantasia
 - **Telefone Comercial**: Telefone comercial com DDD
 
-#### Endereço Completo
+#### 🏠 Endereço Completo
 - **CEP**: Gera CEP válido (XXXXX-XXX)
 - **Endereço**: Logradouro completo
 - **Número**: Número do endereço
@@ -220,7 +236,7 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 - **Cidade**: Cidade brasileira
 - **UF**: Estado correspondente
 
-#### Responsável Legal
+#### 👤 Responsável Legal
 - **Responsável Legal**: Nome completo do responsável
 - **CPF do Responsável**: CPF válido do responsável
 
@@ -228,6 +244,12 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 - **Gerar Pessoa Jurídica**: Gera todos os dados de uma vez
 - **Copiar Todos os Dados**: Copia todos os dados em formato texto
 - **Copiar como JSON**: Copia os dados em formato JSON estruturado
+
+#### 🎨 Melhorias de Layout
+- **Cards por Categoria**: Organização visual clara com 4 cards (Dados da Empresa, Contatos, Endereço, Responsável Legal)
+- **Grid Responsivo**: Layout adaptável (1 coluna para Dados da Empresa, 2 colunas para Contatos/Endereço, 1 coluna para Responsável)
+- **Visual Consistente**: Alinhado com o padrão da aba Geradores de Dados
+- **Leitura Cognitiva**: Agrupamento visual facilita localização rápida de informações
 
 ### 3. 🎲 Aba Geradores de Dados *(Primeira Aba - Refatorada)*
 
