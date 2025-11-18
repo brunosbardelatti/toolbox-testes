@@ -177,3 +177,77 @@ header p {
     color: var(--ds-text-secondary);
 }
 
+/* ============================================
+   ESTILOS PARA ABA GERADORES DE DADOS
+   ============================================ */
+
+/* Cards de geradores - efeito hover */
+#aba-geradores .generator-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 12px;
+    border-width: 1px;
+    border-color: var(--ds-border-subtle) !important;
+    background-color: var(--ds-bg-elevated-soft);
+}
+
+#aba-geradores .generator-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Headers dos cards com bordas arredondadas */
+#aba-geradores .card-header {
+    border-radius: 12px 12px 0 0 !important;
+    font-weight: 600;
+    border-bottom: 1px solid var(--ds-border-subtle);
+    background-color: var(--ds-bg-elevated) !important;
+}
+
+/* Inputs readonly nos cards - fonte monoespaçada */
+#aba-geradores .form-control[readonly] {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    background-color: rgba(17, 24, 39, 0.5) !important;
+}
+
+/* Botões de copiar mais compactos */
+#aba-geradores .btn-outline-secondary {
+    min-width: 45px;
+    padding: 0.375rem 0.5rem;
+}
+
+/* Espaçamento interno dos cards */
+#aba-geradores .card-body {
+    padding: 1.25rem;
+}
+
+/* Espaçamento entre geradores dentro do mesmo card */
+#aba-geradores .card-body > div:not(:last-child) {
+    margin-bottom: 1rem;
+}
+
+/* Botões de gerar com largura total */
+#aba-geradores .btn-primary.w-100 {
+    font-weight: 500;
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+    #aba-geradores .generator-card {
+        margin-bottom: 1rem;
+    }
+    
+    #aba-geradores .card-body {
+        padding: 1rem;
+    }
+    
+    /* Botões de data/hora em coluna no mobile */
+    #aba-geradores .d-md-flex {
+        flex-direction: column;
+    }
+    
+    #aba-geradores .flex-fill {
+        width: 100%;
+    }
+}
+

@@ -17,14 +17,29 @@ Esta versão inclui as seguintes alterações e melhorias:
 - 🆕 **Novas Funcionalidades**: 
   - **Gerador Pessoa Física Completa**: Gera dados completos de pessoa física (nome, CPF, RG, endereço completo, filiação, etc.)
   - **Gerador Pessoa Jurídica Completa**: Gera dados completos de pessoa jurídica (razão social, CNPJ, inscrição estadual, endereço completo, responsável legal, etc.)
+  - **Ferramentas cURL**: Executor e gerador de comandos cURL com conversão para Fetch/Axios/XHR
 - 📐 **Reorganização de Layout**: 
-  - Reorganização da ordem das abas no menu de navegação
+  - Reorganização da ordem das abas no menu de navegação (Geradores de Dados como primeira aba)
   - Separação dos geradores completos em abas dedicadas
   - Melhorias na organização visual e consistência de elementos
+  - **Refatoração completa da aba Geradores de Dados**:
+    - Layout em grid responsivo (3 colunas desktop, 2 tablet, 1 mobile)
+    - Agrupamento por categorias em cards (Documentos, Contatos, Identificadores, Data/Hora, Pessoas)
+    - Visual mais organizado e harmônico
+    - Redução de ~60% no scroll vertical necessário
+    - Cores neutras alinhadas ao tema escuro
+  - **Refatoração das abas Pessoa Física e Pessoa Jurídica**:
+    - Organização por categorias em cards (Dados Pessoais/Empresa, Contatos, Endereço, Filiação/Responsável)
+    - Layout em grid responsivo para melhor aproveitamento do espaço
+    - Visual consistente com a aba Geradores de Dados
+    - Melhor leitura cognitiva com agrupamento visual claro
+    - Headers com ícones para identificação rápida das seções
 - 🎯 **Melhorias de UX**: 
   - Consistência visual entre todos os elementos
   - Remoção de efeitos hover desnecessários em campos readonly
   - Ajustes de espaçamento e hierarquia visual
+  - Leitura cognitiva melhorada com agrupamento visual por categorias
+  - Efeitos hover sutis nos cards para melhor feedback visual
 
 ### Créditos e Agradecimentos
 
@@ -106,11 +121,12 @@ Profissionais de QA frequentemente enfrentam os seguintes desafios no seu dia a 
 
 ### Cenários de Uso Comuns
 
-- **Teste de APIs**: Decodificar JWT, formatar JSON, gerar hashes
+- **Teste de APIs**: Decodificar JWT, formatar JSON, gerar hashes, executar e converter comandos cURL
 - **Validação de Dados**: Validar CPF/CNPJ, testar expressões regulares
 - **Geração de Dados de Teste**: Criar emails, telefones, CPFs, CNPJs válidos
-- **Análise de Respostas**: Comparar respostas de API, formatar payloads
-- **Debug e Troubleshooting**: Decodificar tokens, analisar logs, testar regex
+- **Análise de Respostas**: Comparar respostas de API, formatar payloads, executar requests HTTP
+- **Debug e Troubleshooting**: Decodificar tokens, analisar logs, testar regex, converter cURL para código
+- **Desenvolvimento e Integração**: Converter comandos cURL para Fetch/Axios/XHR, gerar comandos cURL a partir de parâmetros
 
 ## ✅ Resultado e Benefícios
 
@@ -155,20 +171,22 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 
 > **Nota**: Esta versão inclui todas as funcionalidades do projeto original, além das novas funcionalidades mencionadas acima.
 
-### 1. 👤 Gerador Pessoa Física Completa *(NOVO)*
+### 1. 👤 Gerador Pessoa Física Completa *(NOVO - Refatorado)*
 
-#### Dados Pessoais
+A aba foi refatorada com organização visual por categorias em cards, melhorando significativamente a leitura cognitiva e a localização de informações.
+
+#### 👤 Dados Pessoais
 - **Nome Completo**: Gera nome brasileiro completo com sobrenomes
 - **CPF**: Gera CPF válido com máscara (XXX.XXX.XXX-XX)
 - **RG**: Gera RG válido com máscara (XX.XXX.XXX-X)
 - **Data de Nascimento**: Gera data de nascimento aleatória (idade entre 18-80 anos)
 
-#### Contatos
+#### 📧 Contatos
 - **Email**: Gera email baseado no nome gerado
 - **Telefone**: Gera telefone fixo com DDD
 - **Celular**: Gera celular com DDD
 
-#### Endereço Completo
+#### 🏠 Endereço Completo
 - **CEP**: Gera CEP válido (XXXXX-XXX)
 - **Endereço**: Logradouro completo
 - **Número**: Número do endereço
@@ -177,7 +195,7 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 - **Cidade**: Cidade brasileira
 - **UF**: Estado correspondente
 
-#### Filiação
+#### 👨‍👩‍👧 Filiação
 - **Nome da Mãe**: Nome completo da mãe
 - **Nome do Pai**: Nome completo do pai
 
@@ -186,9 +204,17 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 - **Copiar Todos os Dados**: Copia todos os dados em formato texto
 - **Copiar como JSON**: Copia os dados em formato JSON estruturado
 
-### 2. 🏢 Gerador Pessoa Jurídica Completa *(NOVO)*
+#### 🎨 Melhorias de Layout
+- **Cards por Categoria**: Organização visual clara com 4 cards (Dados Pessoais, Contatos, Endereço, Filiação)
+- **Grid Responsivo**: Layout adaptável (2 colunas no desktop para Dados/Contatos, 1 coluna para Endereço/Filiação)
+- **Visual Consistente**: Alinhado com o padrão da aba Geradores de Dados
+- **Leitura Cognitiva**: Agrupamento visual facilita localização rápida de informações
 
-#### Dados da Empresa
+### 2. 🏢 Gerador Pessoa Jurídica Completa *(NOVO - Refatorado)*
+
+A aba foi refatorada com organização visual por categorias em cards, melhorando significativamente a leitura cognitiva e a localização de informações.
+
+#### 🏢 Dados da Empresa
 - **Razão Social**: Razão social completa com tipo e sufixo (Ltda, EIRELI, S.A., etc.)
 - **Nome Fantasia**: Nome fantasia da empresa
 - **CNPJ**: Gera CNPJ válido com máscara (XX.XXX.XXX/XXXX-XX)
@@ -197,11 +223,11 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 - **Porte**: Porte da empresa (MEI, Microempresa, Pequeno Porte, etc.)
 - **CNAE Principal**: CNAE principal da empresa
 
-#### Contatos
+#### 📧 Contatos
 - **Email Corporativo**: Email baseado no nome fantasia
 - **Telefone Comercial**: Telefone comercial com DDD
 
-#### Endereço Completo
+#### 🏠 Endereço Completo
 - **CEP**: Gera CEP válido (XXXXX-XXX)
 - **Endereço**: Logradouro completo
 - **Número**: Número do endereço
@@ -210,7 +236,7 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 - **Cidade**: Cidade brasileira
 - **UF**: Estado correspondente
 
-#### Responsável Legal
+#### 👤 Responsável Legal
 - **Responsável Legal**: Nome completo do responsável
 - **CPF do Responsável**: CPF válido do responsável
 
@@ -219,26 +245,42 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 - **Copiar Todos os Dados**: Copia todos os dados em formato texto
 - **Copiar como JSON**: Copia os dados em formato JSON estruturado
 
-### 3. 🎲 Aba Geradores de Dados
+#### 🎨 Melhorias de Layout
+- **Cards por Categoria**: Organização visual clara com 4 cards (Dados da Empresa, Contatos, Endereço, Responsável Legal)
+- **Grid Responsivo**: Layout adaptável (1 coluna para Dados da Empresa, 2 colunas para Contatos/Endereço, 1 coluna para Responsável)
+- **Visual Consistente**: Alinhado com o padrão da aba Geradores de Dados
+- **Leitura Cognitiva**: Agrupamento visual facilita localização rápida de informações
 
-#### Documentos
+### 3. 🎲 Aba Geradores de Dados *(Primeira Aba - Refatorada)*
+
+A aba Geradores de Dados foi completamente refatorada para melhorar a organização visual e a leitura cognitiva. Os geradores estão organizados em cards por categorias, utilizando um layout em grid responsivo.
+
+#### 📄 Documentos
 - **CPF**: Gera CPF válido com máscara (XXX.XXX.XXX-XX)
 - **CNPJ**: Gera CNPJ válido com máscara (XX.XXX.XXX/XXXX-XX)
 
-#### Contatos
+#### 📧 Contatos
 - **Email**: Gera email aleatório válido
 - **Telefone**: Gera telefone com DDD (XX) XXXXX-XXXX
 
-#### Datas e Identificadores
-- **Data/Hora**: 
-  - Formato BR: DD/MM/AAAA HH:MM
-  - Formato ISO: ISO 8601
-  - Timestamp Unix
+#### 🔢 Identificadores
 - **UUID/GUID**: Gera UUID v4 válido
 - **CEP**: Gera CEP válido (XXXXX-XXX)
 
-#### Pessoas
+#### 📅 Data/Hora
+- **Formato BR**: DD/MM/AAAA HH:MM
+- **Formato ISO**: ISO 8601
+- **Timestamp**: Timestamp Unix
+
+#### 👤 Pessoas
 - **Nome Completo**: Gera nome brasileiro completo
+
+#### 🎨 Melhorias de Layout
+- **Grid Responsivo**: Layout adaptável (3 colunas no desktop, 2 no tablet, 1 no mobile)
+- **Cards por Categoria**: Organização visual clara com headers identificadores
+- **Cores Neutras**: Visual harmonioso alinhado ao tema escuro
+- **Efeitos Hover**: Feedback visual sutil ao passar o mouse sobre os cards
+- **Redução de Scroll**: Aproveitamento eficiente do espaço horizontal
 
 ### 4. 📝 Aba Texto
 
@@ -308,6 +350,37 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 - Destaca correspondências no texto
 - Tabela detalhada com informações de cada match
 
+### 10. 🔧 Aba cURL Tools *(NOVO)*
+
+#### Executor de cURL
+- **Validar Estrutura**: Valida e extrai informações do comando cURL (método, URL, headers, body)
+- **Executar Request**: Executa o comando cURL diretamente no navegador
+  - Suporta métodos: GET, POST, PUT, DELETE, PATCH
+  - Exibe status HTTP, tempo de resposta e headers da resposta
+  - Mostra body da resposta formatado
+  - Formatação automática de JSON na resposta
+  - Botão para copiar response completa
+- **Converter para Fetch/Axios**: Converte comando cURL para código JavaScript
+  - **Fetch API**: Código usando Fetch API nativa
+  - **Axios**: Código usando biblioteca Axios
+  - **XMLHttpRequest**: Código usando XHR tradicional
+  - Botão de copiar para cada formato
+- **Limpar**: Limpa todos os campos e áreas de resultado
+
+#### Gerador de cURL
+- **Método HTTP**: Seleção de método (GET, POST, PUT, DELETE, PATCH)
+- **URL**: Campo para inserir a URL do endpoint
+- **Headers**: Campo para inserir headers (um por linha, formato: Chave: Valor)
+- **Body**: Campo para inserir body da requisição (JSON, XML, etc.)
+- **Gerar cURL**: Gera comando cURL completo e formatado
+- **Copiar cURL**: Copia o comando gerado para área de transferência
+
+#### Funcionalidades Adicionais
+- **Extração Automática**: Extrai automaticamente método, URL, headers e body de comandos cURL
+- **Visualização de Informações**: Mostra informações extraídas de forma clara
+- **Tratamento de Erros**: Exibe mensagens de erro claras e úteis
+- **Suporte a CORS**: Nota sobre possíveis limitações de CORS ao executar requests
+
 ## 📖 Como Usar
 
 ### Acesso Rápido
@@ -357,6 +430,24 @@ Com o **QA-Toolbox**, os profissionais de QA agora têm:
 3. Clique em **"Prettify / Formatar"** para formatar
 4. Ou clique em **"Minify / Compactar"** para compactar
 5. Use **"Copiar"** para copiar o resultado
+
+#### Executar e Converter cURL
+
+1. Acesse a aba **"cURL Tools"**
+2. **Para executar um cURL**:
+   - Cole o comando cURL no campo
+   - Clique em **"Validar Estrutura"** para verificar
+   - Clique em **"Executar Request"** para fazer a requisição
+   - Visualize a resposta com status, headers e body
+3. **Para converter cURL**:
+   - Cole o comando cURL no campo
+   - Clique em **"Converter para Fetch/Axios"**
+   - Escolha o formato desejado (Fetch, Axios ou XHR)
+   - Copie o código gerado
+4. **Para gerar um cURL**:
+   - Preencha método, URL, headers e body
+   - Clique em **"Gerar cURL"**
+   - Copie o comando gerado
 
 ## 🛠️ Tecnologias Utilizadas
 
