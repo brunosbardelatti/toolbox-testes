@@ -25,13 +25,13 @@
         <!-- Navegação por Abas -->  
         <ul class="nav nav-tabs mb-4" id="abasNavegacao" role="tablist">  
             <li class="nav-item" role="presentation">  
-                <button class="nav-link active" id="aba-pessoa-fisica-tab" data-bs-toggle="tab" data-bs-target="#aba-pessoa-fisica" type="button" role="tab" aria-controls="aba-pessoa-fisica" aria-selected="true">Gerador Pessoa Física</button>  
+                <button class="nav-link active" id="aba-geradores-tab" data-bs-toggle="tab" data-bs-target="#aba-geradores" type="button" role="tab" aria-controls="aba-geradores" aria-selected="true">Geradores de Dados</button>  
+            </li>  
+            <li class="nav-item" role="presentation">  
+                <button class="nav-link" id="aba-pessoa-fisica-tab" data-bs-toggle="tab" data-bs-target="#aba-pessoa-fisica" type="button" role="tab" aria-controls="aba-pessoa-fisica" aria-selected="false">Gerador Pessoa Física</button>  
             </li>  
             <li class="nav-item" role="presentation">  
                 <button class="nav-link" id="aba-pessoa-juridica-tab" data-bs-toggle="tab" data-bs-target="#aba-pessoa-juridica" type="button" role="tab" aria-controls="aba-pessoa-juridica" aria-selected="false">Gerador Pessoa Jurídica</button>  
-            </li>  
-            <li class="nav-item" role="presentation">  
-                <button class="nav-link" id="aba-geradores-tab" data-bs-toggle="tab" data-bs-target="#aba-geradores" type="button" role="tab" aria-controls="aba-geradores" aria-selected="false">Geradores de Dados</button>  
             </li>  
             <li class="nav-item" role="presentation">  
                 <button class="nav-link" id="aba-texto-tab" data-bs-toggle="tab" data-bs-target="#aba-texto" type="button" role="tab" aria-controls="aba-texto" aria-selected="false">Texto</button>  
@@ -152,261 +152,405 @@
             </div>
 
             <!-- Aba: Geradores de Dados -->
-            <div class="tab-pane fade" id="aba-geradores" role="tabpanel" aria-labelledby="aba-geradores-tab">
-                <h3>Geradores de Dados</h3>
+            <div class="tab-pane fade show active" id="aba-geradores" role="tabpanel" aria-labelledby="aba-geradores-tab">
+                <h3 class="mb-4">Geradores de Dados</h3>
                 
-                <!-- Gerador CPF -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">CPF</label>
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control" id="cpfOutput" readonly placeholder="CPF gerado aparecerá aqui">
-                        <button class="btn btn-outline-secondary" type="button" id="btnCopyCpf">Copiar</button>
+                <div class="row g-4">
+                    <!-- Categoria: Documentos -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card h-100 border-secondary generator-card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">📄 Documentos</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Gerador CPF -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">CPF</label>
+                                    <div class="input-group mb-2">
+                                        <input type="text" class="form-control" id="cpfOutput" readonly placeholder="CPF gerado aparecerá aqui">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnCopyCpf" title="Copiar CPF">📋</button>
+                                    </div>
+                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateCpf">Gerar CPF</button>
+                                </div>
+                                
+                                <!-- Gerador CNPJ -->
+                                <div>
+                                    <label class="form-label fw-bold">CNPJ</label>
+                                    <div class="input-group mb-2">
+                                        <input type="text" class="form-control" id="cnpjOutput" readonly placeholder="CNPJ gerado aparecerá aqui">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnCopyCnpj" title="Copiar CNPJ">📋</button>
+                                    </div>
+                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateCnpj">Gerar CNPJ</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-primary" id="btnGenerateCpf">Gerar CPF</button>
-                </div>
 
-                <!-- Gerador CNPJ -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">CNPJ</label>
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control" id="cnpjOutput" readonly placeholder="CNPJ gerado aparecerá aqui">
-                        <button class="btn btn-outline-secondary" type="button" id="btnCopyCnpj">Copiar</button>
+                    <!-- Categoria: Contatos -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card h-100 border-secondary generator-card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">📧 Contatos</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Gerador Email -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Email</label>
+                                    <div class="input-group mb-2">
+                                        <input type="text" class="form-control" id="emailOutput" readonly placeholder="Email gerado aparecerá aqui">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnCopyEmail" title="Copiar Email">📋</button>
+                                    </div>
+                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateEmail">Gerar Email</button>
+                                </div>
+                                
+                                <!-- Gerador Telefone -->
+                                <div>
+                                    <label class="form-label fw-bold">Telefone</label>
+                                    <div class="input-group mb-2">
+                                        <input type="text" class="form-control" id="telefoneOutput" readonly placeholder="Telefone gerado aparecerá aqui">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnCopyTelefone" title="Copiar Telefone">📋</button>
+                                    </div>
+                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateTelefone">Gerar Telefone</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-primary" id="btnGenerateCnpj">Gerar CNPJ</button>
-                </div>
 
-                <hr class="my-4">
+                    <!-- Categoria: Identificadores -->
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card h-100 border-secondary generator-card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">🔢 Identificadores</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Gerador UUID -->
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">UUID/GUID</label>
+                                    <div class="input-group mb-2">
+                                        <input type="text" class="form-control" id="uuidOutput" readonly placeholder="UUID gerado aparecerá aqui">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnCopyUuid" title="Copiar UUID">📋</button>
+                                    </div>
+                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateUuid">Gerar UUID</button>
+                                </div>
+                                
+                                <!-- Gerador CEP -->
+                                <div>
+                                    <label class="form-label fw-bold">CEP</label>
+                                    <div class="input-group mb-2">
+                                        <input type="text" class="form-control" id="cepOutput" readonly placeholder="CEP gerado aparecerá aqui">
+                                        <button class="btn btn-outline-secondary" type="button" id="btnCopyCep" title="Copiar CEP">📋</button>
+                                    </div>
+                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateCep">Gerar CEP</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Gerador Email -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Email</label>
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control" id="emailOutput" readonly placeholder="Email gerado aparecerá aqui">
-                        <button class="btn btn-outline-secondary" type="button" id="btnCopyEmail">Copiar</button>
+                    <!-- Categoria: Data/Hora -->
+                    <div class="col-lg-6 col-md-6">
+                        <div class="card h-100 border-secondary generator-card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">📅 Data/Hora</h5>
+                            </div>
+                            <div class="card-body">
+                                <label class="form-label fw-bold">Data/Hora</label>
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" id="dataOutput" readonly placeholder="Data/Hora gerada aparecerá aqui">
+                                    <button class="btn btn-outline-secondary" type="button" id="btnCopyData" title="Copiar Data/Hora">📋</button>
+                                </div>
+                                <div class="d-grid gap-2 d-md-flex">
+                                    <button type="button" class="btn btn-primary flex-fill" id="btnGenerateDataBR">BR</button>
+                                    <button type="button" class="btn btn-primary flex-fill" id="btnGenerateDataISO">ISO</button>
+                                    <button type="button" class="btn btn-primary flex-fill" id="btnGenerateTimestamp">Timestamp</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-primary" id="btnGenerateEmail">Gerar Email</button>
-                </div>
 
-                <!-- Gerador Telefone -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Telefone</label>
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control" id="telefoneOutput" readonly placeholder="Telefone gerado aparecerá aqui">
-                        <button class="btn btn-outline-secondary" type="button" id="btnCopyTelefone">Copiar</button>
+                    <!-- Categoria: Pessoas -->
+                    <div class="col-lg-6 col-md-6">
+                        <div class="card h-100 border-secondary generator-card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">👤 Pessoas</h5>
+                            </div>
+                            <div class="card-body">
+                                <label class="form-label fw-bold">Nome Completo</label>
+                                <div class="input-group mb-2">
+                                    <input type="text" class="form-control" id="nomeOutput" readonly placeholder="Nome completo gerado aparecerá aqui">
+                                    <button class="btn btn-outline-secondary" type="button" id="btnCopyNome" title="Copiar Nome">📋</button>
+                                </div>
+                                <button type="button" class="btn btn-primary w-100" id="btnGenerateNome">Gerar Nome Completo</button>
+                            </div>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-primary" id="btnGenerateTelefone">Gerar Telefone</button>
-                </div>
-
-                <!-- Gerador Data/Hora -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Data/Hora</label>
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control" id="dataOutput" readonly placeholder="Data/Hora gerada aparecerá aqui">
-                        <button class="btn btn-outline-secondary" type="button" id="btnCopyData">Copiar</button>
-                    </div>
-                    <div class="d-flex flex-wrap gap-2">
-                        <button type="button" class="btn btn-primary" id="btnGenerateDataBR">Gerar Data (BR)</button>
-                        <button type="button" class="btn btn-primary" id="btnGenerateDataISO">Gerar Data (ISO)</button>
-                        <button type="button" class="btn btn-primary" id="btnGenerateTimestamp">Gerar Timestamp</button>
-                    </div>
-                </div>
-
-                <!-- Gerador UUID -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">UUID/GUID</label>
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control" id="uuidOutput" readonly placeholder="UUID gerado aparecerá aqui">
-                        <button class="btn btn-outline-secondary" type="button" id="btnCopyUuid">Copiar</button>
-                    </div>
-                    <button type="button" class="btn btn-primary" id="btnGenerateUuid">Gerar UUID</button>
-                </div>
-
-                <!-- Gerador CEP -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">CEP</label>
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control" id="cepOutput" readonly placeholder="CEP gerado aparecerá aqui">
-                        <button class="btn btn-outline-secondary" type="button" id="btnCopyCep">Copiar</button>
-                    </div>
-                    <button type="button" class="btn btn-primary" id="btnGenerateCep">Gerar CEP</button>
-                </div>
-
-                <!-- Gerador Nome Completo -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Nome Completo</label>
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control" id="nomeOutput" readonly placeholder="Nome completo gerado aparecerá aqui">
-                        <button class="btn btn-outline-secondary" type="button" id="btnCopyNome">Copiar</button>
-                    </div>
-                    <button type="button" class="btn btn-primary" id="btnGenerateNome">Gerar Nome Completo</button>
                 </div>
             </div>
 
             <!-- Aba: Pessoa Física Completa -->
-            <div class="tab-pane fade show active" id="aba-pessoa-fisica" role="tabpanel" aria-labelledby="aba-pessoa-fisica-tab">
+            <div class="tab-pane fade" id="aba-pessoa-fisica" role="tabpanel" aria-labelledby="aba-pessoa-fisica-tab">
                 <h3 class="mb-4">Pessoa Física Completa</h3>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Nome Completo</label>
-                                <input type="text" class="form-control" id="pfNome" readonly>
+                
+                <div class="row g-4">
+                    <!-- Card: Dados Pessoais -->
+                    <div class="col-lg-6">
+                        <div class="card h-100 border-secondary generator-card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">👤 Dados Pessoais</h5>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">CPF</label>
-                                <input type="text" class="form-control" id="pfCpf" readonly>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Nome Completo</label>
+                                        <input type="text" class="form-control" id="pfNome" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">CPF</label>
+                                        <input type="text" class="form-control" id="pfCpf" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">RG</label>
+                                        <input type="text" class="form-control" id="pfRg" readonly>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Data de Nascimento</label>
+                                        <input type="text" class="form-control" id="pfDataNascimento" readonly>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">RG</label>
-                                <input type="text" class="form-control" id="pfRg" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Data de Nascimento</label>
-                                <input type="text" class="form-control" id="pfDataNascimento" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Email</label>
-                                <input type="text" class="form-control" id="pfEmail" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Telefone</label>
-                                <input type="text" class="form-control" id="pfTelefone" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Celular</label>
-                                <input type="text" class="form-control" id="pfCelular" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">CEP</label>
-                                <input type="text" class="form-control" id="pfCep" readonly>
-                            </div>
-                            <div class="col-md-8">
-                                <label class="form-label fw-bold">Endereço</label>
-                                <input type="text" class="form-control" id="pfEndereco" readonly>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Número</label>
-                                <input type="text" class="form-control" id="pfNumero" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Complemento</label>
-                                <input type="text" class="form-control" id="pfComplemento" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Bairro</label>
-                                <input type="text" class="form-control" id="pfBairro" readonly>
-                            </div>
-                            <div class="col-md-8">
-                                <label class="form-label fw-bold">Cidade</label>
-                                <input type="text" class="form-control" id="pfCidade" readonly>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">UF</label>
-                                <input type="text" class="form-control" id="pfUf" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Nome da Mãe</label>
-                                <input type="text" class="form-control" id="pfNomeMae" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Nome do Pai</label>
-                                <input type="text" class="form-control" id="pfNomePai" readonly>
-                            </div>
-                        </div>
-                        <div class="mt-3 d-flex gap-2">
-                            <button type="button" class="btn btn-primary" id="btnGerarPF">Gerar Pessoa Física</button>
-                            <button type="button" class="btn btn-success" id="btnCopiarPF">Copiar Todos os Dados</button>
-                            <button type="button" class="btn btn-info" id="btnCopiarPFJson">Copiar como JSON</button>
                         </div>
                     </div>
+
+                    <!-- Card: Contatos -->
+                    <div class="col-lg-6">
+                        <div class="card h-100 border-secondary generator-card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">📧 Contatos</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Email</label>
+                                        <input type="text" class="form-control" id="pfEmail" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Telefone</label>
+                                        <input type="text" class="form-control" id="pfTelefone" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Celular</label>
+                                        <input type="text" class="form-control" id="pfCelular" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Endereço Completo -->
+                    <div class="col-12">
+                        <div class="card border-secondary generator-card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">🏠 Endereço Completo</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">CEP</label>
+                                        <input type="text" class="form-control" id="pfCep" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Endereço</label>
+                                        <input type="text" class="form-control" id="pfEndereco" readonly>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">Número</label>
+                                        <input type="text" class="form-control" id="pfNumero" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Complemento</label>
+                                        <input type="text" class="form-control" id="pfComplemento" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Bairro</label>
+                                        <input type="text" class="form-control" id="pfBairro" readonly>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label fw-bold">Cidade</label>
+                                        <input type="text" class="form-control" id="pfCidade" readonly>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">UF</label>
+                                        <input type="text" class="form-control" id="pfUf" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Filiação -->
+                    <div class="col-12">
+                        <div class="card border-secondary generator-card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">👨‍👩‍👧 Filiação</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Nome da Mãe</label>
+                                        <input type="text" class="form-control" id="pfNomeMae" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Nome do Pai</label>
+                                        <input type="text" class="form-control" id="pfNomePai" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="mt-4 d-flex gap-2 justify-content-end">
+                    <button type="button" class="btn btn-primary" id="btnGerarPF">Gerar Pessoa Física</button>
+                    <button type="button" class="btn btn-success" id="btnCopiarPF">Copiar Todos os Dados</button>
+                    <button type="button" class="btn btn-info" id="btnCopiarPFJson">Copiar como JSON</button>
                 </div>
             </div>
 
             <!-- Aba: Pessoa Jurídica Completa -->
             <div class="tab-pane fade" id="aba-pessoa-juridica" role="tabpanel" aria-labelledby="aba-pessoa-juridica-tab">
                 <h3 class="mb-4">Pessoa Jurídica Completa</h3>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-8">
-                                <label class="form-label fw-bold">Razão Social</label>
-                                <input type="text" class="form-control" id="pjRazaoSocial" readonly>
+                
+                <div class="row g-4">
+                    <!-- Card: Dados da Empresa -->
+                    <div class="col-12">
+                        <div class="card border-secondary generator-card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">🏢 Dados da Empresa</h5>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Nome Fantasia</label>
-                                <input type="text" class="form-control" id="pjNomeFantasia" readonly>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label class="form-label fw-bold">Razão Social</label>
+                                        <input type="text" class="form-control" id="pjRazaoSocial" readonly>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Nome Fantasia</label>
+                                        <input type="text" class="form-control" id="pjNomeFantasia" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">CNPJ</label>
+                                        <input type="text" class="form-control" id="pjCnpj" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Inscrição Estadual</label>
+                                        <input type="text" class="form-control" id="pjInscricaoEstadual" readonly>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Data de Abertura</label>
+                                        <input type="text" class="form-control" id="pjDataAbertura" readonly>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">Porte</label>
+                                        <input type="text" class="form-control" id="pjPorte" readonly>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">CNAE Principal</label>
+                                        <input type="text" class="form-control" id="pjCnae" readonly>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">CNPJ</label>
-                                <input type="text" class="form-control" id="pjCnpj" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Inscrição Estadual</label>
-                                <input type="text" class="form-control" id="pjInscricaoEstadual" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Data de Abertura</label>
-                                <input type="text" class="form-control" id="pjDataAbertura" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Porte</label>
-                                <input type="text" class="form-control" id="pjPorte" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Email Corporativo</label>
-                                <input type="text" class="form-control" id="pjEmail" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Telefone Comercial</label>
-                                <input type="text" class="form-control" id="pjTelefone" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">CEP</label>
-                                <input type="text" class="form-control" id="pjCep" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">CNAE Principal</label>
-                                <input type="text" class="form-control" id="pjCnae" readonly>
-                            </div>
-                            <div class="col-md-8">
-                                <label class="form-label fw-bold">Endereço</label>
-                                <input type="text" class="form-control" id="pjEndereco" readonly>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Número</label>
-                                <input type="text" class="form-control" id="pjNumero" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Complemento</label>
-                                <input type="text" class="form-control" id="pjComplemento" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Bairro</label>
-                                <input type="text" class="form-control" id="pjBairro" readonly>
-                            </div>
-                            <div class="col-md-8">
-                                <label class="form-label fw-bold">Cidade</label>
-                                <input type="text" class="form-control" id="pjCidade" readonly>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">UF</label>
-                                <input type="text" class="form-control" id="pjUf" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Responsável Legal</label>
-                                <input type="text" class="form-control" id="pjResponsavel" readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">CPF do Responsável</label>
-                                <input type="text" class="form-control" id="pjCpfResponsavel" readonly>
-                            </div>
-                        </div>
-                        <div class="mt-3 d-flex gap-2">
-                            <button type="button" class="btn btn-primary" id="btnGerarPJ">Gerar Pessoa Jurídica</button>
-                            <button type="button" class="btn btn-success" id="btnCopiarPJ">Copiar Todos os Dados</button>
-                            <button type="button" class="btn btn-info" id="btnCopiarPJJson">Copiar como JSON</button>
                         </div>
                     </div>
+
+                    <!-- Card: Contatos -->
+                    <div class="col-lg-6">
+                        <div class="card h-100 border-secondary generator-card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">📧 Contatos</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Email Corporativo</label>
+                                        <input type="text" class="form-control" id="pjEmail" readonly>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Telefone Comercial</label>
+                                        <input type="text" class="form-control" id="pjTelefone" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Endereço Completo -->
+                    <div class="col-lg-6">
+                        <div class="card h-100 border-secondary generator-card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">🏠 Endereço Completo</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">CEP</label>
+                                        <input type="text" class="form-control" id="pjCep" readonly>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label fw-bold">Endereço</label>
+                                        <input type="text" class="form-control" id="pjEndereco" readonly>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">Número</label>
+                                        <input type="text" class="form-control" id="pjNumero" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Complemento</label>
+                                        <input type="text" class="form-control" id="pjComplemento" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Bairro</label>
+                                        <input type="text" class="form-control" id="pjBairro" readonly>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label fw-bold">Cidade</label>
+                                        <input type="text" class="form-control" id="pjCidade" readonly>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold">UF</label>
+                                        <input type="text" class="form-control" id="pjUf" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Responsável Legal -->
+                    <div class="col-12">
+                        <div class="card border-secondary generator-card">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">👤 Responsável Legal</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Responsável Legal</label>
+                                        <input type="text" class="form-control" id="pjResponsavel" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">CPF do Responsável</label>
+                                        <input type="text" class="form-control" id="pjCpfResponsavel" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="mt-4 d-flex gap-2 justify-content-end">
+                    <button type="button" class="btn btn-primary" id="btnGerarPJ">Gerar Pessoa Jurídica</button>
+                    <button type="button" class="btn btn-success" id="btnCopiarPJ">Copiar Todos os Dados</button>
+                    <button type="button" class="btn btn-info" id="btnCopiarPJJson">Copiar como JSON</button>
                 </div>
             </div>  
 
