@@ -1,0 +1,179 @@
+/**
+ * Estilos customizados para QA-Toolbox
+ * Compatível com Bootstrap Dark Theme - BSQA Design System
+ */
+
+/* Layout para rodapé fixo no final */
+html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    flex: 1;
+}
+
+/* Ajuste de altura para textareas */
+textarea {
+    min-height: 200px;
+    resize: vertical;
+}
+
+/* Textarea grande para JSON */
+#jsonInput {
+    min-height: 300px;
+}
+
+/* Espaçamento entre seções */
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+/* Badges de contadores - já estilizados no bootstrap-dark-theme.css */
+.badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    transition: transform 0.2s ease;
+}
+
+.badge:hover {
+    transform: scale(1.05);
+}
+
+/* Ajuste de responsividade */
+@media (max-width: 768px) {
+    .d-flex.flex-wrap {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem !important;
+    }
+}
+
+/* Estilo para campos readonly - dark theme */
+input[readonly] {
+    background-color: rgba(17, 24, 39, 0.5) !important;
+    cursor: default;
+    opacity: 0.8;
+}
+
+/* Estilos para comparador - dark theme */
+#comparadorResultado table {
+    font-size: 0.9rem;
+}
+
+#comparadorResultado code {
+    background-color: rgba(15, 23, 42, 0.5);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--ds-text-primary);
+}
+
+/* Estilos para JWT e Hash - dark theme */
+#jwtResultado pre,
+#hashOutput {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    background-color: var(--ds-bg-elevated-soft);
+    border: 1px solid var(--ds-border-subtle);
+    color: var(--ds-text-primary);
+    padding: 1rem;
+    border-radius: 12px;
+}
+
+#jwtResultado .card {
+    background: radial-gradient(circle at top left, var(--ds-accent-soft), var(--ds-bg-elevated-soft));
+}
+
+/* Estilos para Regex - dark theme */
+#regexResultado mark {
+    background-color: rgba(251, 191, 36, 0.3);
+    padding: 2px 4px;
+    border-radius: 3px;
+    color: var(--ds-text-primary);
+}
+
+#regexResultado pre {
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: var(--ds-bg-elevated-soft);
+    border: 1px solid var(--ds-border-subtle);
+    color: var(--ds-text-primary);
+    padding: 1rem;
+    border-radius: 12px;
+}
+
+/* Estilos para rodapé - já estilizado no bootstrap-dark-theme.css */
+footer {
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.container {
+    flex: 1 0 auto;
+}
+
+/* Ajustes específicos para elementos gerados dinamicamente */
+#comparadorResultado .card {
+    margin-top: 1rem;
+}
+
+#comparadorResultado .table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Estilos para resultados de regex */
+#regexResultado .table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Ajustes para código dentro de cards */
+.card pre,
+.card code {
+    background-color: rgba(15, 23, 42, 0.5);
+    color: var(--ds-text-primary);
+}
+
+/* Melhorias visuais para seções */
+h3 {
+    color: var(--ds-text-primary);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+/* Ajustes para input groups nos geradores */
+.input-group .form-control[readonly] {
+    background-color: rgba(17, 24, 39, 0.5) !important;
+}
+
+/* Estilos para alertas customizados (se necessário) */
+#jsonAlertContainer {
+    margin-bottom: 1rem;
+}
+
+/* Ajustes de espaçamento específicos */
+.tab-content {
+    padding-top: 1rem;
+}
+
+/* Melhorias para acessibilidade */
+.btn:focus-visible {
+    outline: 2px solid var(--ds-accent);
+    outline-offset: 2px;
+}
+
+/* Ajustes para elementos específicos do QA-Toolbox */
+header h1 {
+    color: var(--ds-text-primary);
+    font-weight: 700;
+}
+
+header p {
+    color: var(--ds-text-secondary);
+}
+
