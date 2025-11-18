@@ -3,7 +3,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     // ============================================
-    // ABA 1: TEXTO - Contadores
+    // ABA: TEXTO - Contadores
     // ============================================
     const textInputCounters = document.getElementById('textInputCounters');
     const charCount = document.getElementById('charCount');
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
     textInputCounters.addEventListener('input', atualizarContadores);
 
     // ============================================
-    // ABA 1: TEXTO - Conversores de Case
+    // ABA: TEXTO - Conversores de Case
     // ============================================
     const textInputCase = document.getElementById('textInputCase');
     const btnUppercase = document.getElementById('btnUppercase');
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================
-    // ABA 2: ENCODERS/DECODERS - Base64
+    // ABA: ENCODERS/DECODERS - Base64
     // ============================================
     const base64Input = document.getElementById('base64Input');
     const base64Output = document.getElementById('base64Output');
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================
-    // ABA 2: ENCODERS/DECODERS - URL
+    // ABA: ENCODERS/DECODERS - URL
     // ============================================
     const urlInput = document.getElementById('urlInput');
     const urlOutput = document.getElementById('urlOutput');
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================
-    // ABA 3: FORMATADORES - JSON
+    // ABA: FORMATADORES - JSON
     // ============================================
     const jsonInput = document.getElementById('jsonInput');
     const btnJsonPrettify = document.getElementById('btnJsonPrettify');
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================
-    // ABA 4: GERADORES DE DADOS - CPF
+    // ABA: GERADORES DE DADOS - CPF
     // ============================================
     const cpfOutput = document.getElementById('cpfOutput');
     const btnGenerateCpf = document.getElementById('btnGenerateCpf');
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================
-    // ABA 4: GERADORES DE DADOS - CNPJ
+    // ABA: GERADORES DE DADOS - CNPJ
     // ============================================
     const cnpjOutput = document.getElementById('cnpjOutput');
     const btnGenerateCnpj = document.getElementById('btnGenerateCnpj');
@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ============================================
-    // ABA 4: GERADORES DE DADOS EXPANDIDOS
+    // ABA: GERADORES DE DADOS EXPANDIDOS
     // ============================================
     
     // Gerador Email
@@ -555,7 +555,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ============================================  
-// ABA 5: GERADORES COMPLETOS  
+// ABA: GERADORES COMPLETOS  
 // ============================================
   
 // ============================================  
@@ -1005,7 +1005,7 @@ function mostrarFeedbackBotao(botao, mensagem) {
 }  
 
     // ============================================
-    // ABA 6: COMPARADOR DE TEXTOS/JSON
+    // ABA: COMPARADOR DE TEXTOS/JSON
     // ============================================
     const comparadorTexto1 = document.getElementById('comparadorTexto1');
     const comparadorTexto2 = document.getElementById('comparadorTexto2');
@@ -1077,7 +1077,7 @@ function mostrarFeedbackBotao(botao, mensagem) {
     });
 
     // ============================================
-    // ABA 7: JWT DECODER
+    // ABA: JWT DECODER
     // ============================================
     const jwtInput = document.getElementById('jwtInput');
     const btnDecodificarJwt = document.getElementById('btnDecodificarJwt');
@@ -1154,7 +1154,7 @@ function mostrarFeedbackBotao(botao, mensagem) {
     });
 
     // ============================================
-    // ABA 8: HASH GENERATOR
+    // ABA: HASH GENERATOR
     // ============================================
     const hashInput = document.getElementById('hashInput');
     const hashOutput = document.getElementById('hashOutput');
@@ -1224,7 +1224,7 @@ function mostrarFeedbackBotao(botao, mensagem) {
     });
 
     // ============================================
-    // ABA 9: REGEX TESTER
+    // ABA: REGEX TESTER
     // ============================================
     const regexPattern = document.getElementById('regexPattern');
     const regexTestText = document.getElementById('regexTestText');
@@ -1313,5 +1313,479 @@ function mostrarFeedbackBotao(botao, mensagem) {
         }
     });
 
+    // ============================================  
+    // ABA: FERRAMENTAS cURL  
+    // ============================================
+    
+    // ============================================  
+    // PARSER DE cURL  
+    // ============================================
+    
+    function parseCurl(curlCommand) {  
+        try {  
+            // Remove quebras de linha e espaços extras  
+            let cmd = curlCommand.replace(/\\\n/g, ' ').replace(/\s+/g, ' ').trim();
+            
+            // Remove 'curl' do início  
+            cmd = cmd.replace(/^curl\s+/i, '');
+            
+            const result = {  
+                method: 'GET',  
+                url: '',  
+                headers: {},  
+                body: null  
+            };
+            
+            // Extrai método  
+            const methodMatch = cmd.match(/-X\s+(\w+)/i);  
+            if (methodMatch) {  
+                result.method = methodMatch[1].toUpperCase();  
+            }
+            
+            // Extrai URL (primeira string após aspas ou primeira palavra sem -)  
+            const urlMatch = cmd.match(/(?:curl\s+)?(?:-X\s+\w+\s+)?['"]?([^\s'"]+)/i) ||   
+                            cmd.match(/(?:^|\s)(?!-)(https?:\/\/[^\s'"]+)/i);  
+            if (urlMatch) {  
+                result.url = urlMatch[1] || urlMatch[0];  
+                result.url = result.url.replace(/^['"]|['"]$/g, '');  
+            }
+            
+            // Extrai headers  
+            const headerRegex = /-H\s+['"]([^'"]+)['"]/gi;  
+            let headerMatch;  
+            while ((headerMatch = headerRegex.exec(cmd)) !== null) {  
+                const header = headerMatch[1];  
+                const colonIndex = header.indexOf(':');  
+                if (colonIndex > -1) {  
+                    const key = header.substring(0, colonIndex).trim();  
+                    const value = header.substring(colonIndex + 1).trim();  
+                    result.headers[key] = value;  
+                }  
+            }
+            
+            // Extrai body (-d ou --data)  
+            const bodyMatch = cmd.match(/(?:-d|--data|--data-raw)\s+['"](.+?)['"]/i);  
+            if (bodyMatch) {  
+                result.body = bodyMatch[1];  
+                // Tenta fazer parse se for JSON  
+                try {  
+                    result.body = JSON.parse(result.body);  
+                } catch (e) {  
+                    // Mantém como string se não for JSON válido  
+                }  
+            }
+            
+            return result;  
+        } catch (error) {  
+            throw new Error('Erro ao fazer parse do cURL: ' + error.message);  
+        }  
+    }
+    
+    // ============================================  
+    // VALIDAR cURL  
+    // ============================================
+    
+    document.getElementById('btnValidarCurl').addEventListener('click', function() {  
+        const curlInput = document.getElementById('curlInput').value.trim();  
+        const errorArea = document.getElementById('curlErrorArea');  
+        const infoArea = document.getElementById('curlInfoArea');
+        
+        // Esconde áreas  
+        document.getElementById('curlResponseArea').style.display = 'none';  
+        document.getElementById('curlConversaoArea').style.display = 'none';  
+        errorArea.style.display = 'none';
+        
+        if (!curlInput) {  
+            errorArea.style.display = 'block';  
+            document.getElementById('curlErrorMessage').textContent = 'Por favor, cole um comando cURL.';  
+            return;  
+        }
+        
+        try {  
+            const parsed = parseCurl(curlInput);
+            
+            if (!parsed.url) {  
+                throw new Error('URL não encontrada no comando cURL.');  
+            }
+            
+            // Mostra informações extraídas  
+            document.getElementById('curlMetodo').textContent = parsed.method;  
+            document.getElementById('curlUrl').textContent = parsed.url;  
+            document.getElementById('curlHeadersCount').textContent = Object.keys(parsed.headers).length + ' header(s)';  
+            document.getElementById('curlBodyStatus').textContent = parsed.body ? 'Presente' : 'Ausente';
+            
+            infoArea.style.display = 'block';
+            
+            // Feedback sucesso  
+            mostrarToast('✓ cURL válido! Estrutura OK.', 'success');
+            
+        } catch (error) {  
+            errorArea.style.display = 'block';  
+            document.getElementById('curlErrorMessage').textContent = error.message;  
+        }  
+    });
+    
+    // ============================================  
+    // EXECUTAR cURL  
+    // ============================================
+    
+    document.getElementById('btnExecutarCurl').addEventListener('click', async function() {  
+        const curlInput = document.getElementById('curlInput').value.trim();  
+        const errorArea = document.getElementById('curlErrorArea');  
+        const responseArea = document.getElementById('curlResponseArea');  
+        const btnExecutar = this;
+        
+        errorArea.style.display = 'none';  
+        document.getElementById('curlConversaoArea').style.display = 'none';
+        
+        if (!curlInput) {  
+            errorArea.style.display = 'block';  
+            document.getElementById('curlErrorMessage').textContent = 'Por favor, cole um comando cURL.';  
+            return;  
+        }
+        
+        try {  
+            const parsed = parseCurl(curlInput);
+            
+            if (!parsed.url) {  
+                throw new Error('URL não encontrada no comando cURL.');  
+            }
+            
+            // Desabilita botão durante execução  
+            btnExecutar.disabled = true;  
+            btnExecutar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Executando...';
+            
+            // Marca tempo inicial  
+            const startTime = performance.now();
+            
+            // Prepara opções do fetch  
+            const options = {  
+                method: parsed.method,  
+                headers: parsed.headers  
+            };
+            
+            // Adiciona body se não for GET  
+            if (parsed.method !== 'GET' && parsed.body) {  
+                options.body = typeof parsed.body === 'string' ? parsed.body : JSON.stringify(parsed.body);  
+            }
+            
+            // Executa request  
+            const response = await fetch(parsed.url, options);
+            
+            // Calcula tempo  
+            const endTime = performance.now();  
+            const duration = (endTime - startTime).toFixed(2);
+            
+            // Extrai headers da response  
+            const responseHeaders = {};  
+            response.headers.forEach((value, key) => {  
+                responseHeaders[key] = value;  
+            });
+            
+            // Extrai body  
+            const contentType = response.headers.get('content-type') || '';  
+            let responseBody;
+            
+            if (contentType.includes('application/json')) {  
+                responseBody = await response.json();  
+                responseBody = JSON.stringify(responseBody, null, 2);  
+            } else if (contentType.includes('text/')) {  
+                responseBody = await response.text();  
+            } else {  
+                responseBody = await response.text();  
+            }
+            
+            // Mostra resultado  
+            const statusBadge = document.getElementById('responseStatus');  
+            statusBadge.textContent = `${response.status} ${response.statusText}`;  
+            statusBadge.className = 'badge ' + (response.ok ? 'bg-success' : 'bg-danger');
+            
+            document.getElementById('responseTime').textContent = `⏱️ ${duration}ms`;  
+            document.getElementById('responseHeadersContent').textContent = JSON.stringify(responseHeaders, null, 2);  
+            document.getElementById('curlResponse').value = responseBody;
+            
+            responseArea.style.display = 'block';
+            
+            mostrarToast('✓ Request executada com sucesso!', 'success');
+            
+        } catch (error) {  
+            errorArea.style.display = 'block';  
+            document.getElementById('curlErrorMessage').textContent =   
+                'Erro ao executar request: ' + error.message +   
+                '\n\nNota: Pode haver problemas de CORS. Use uma extensão de CORS ou proxy.';  
+        } finally {  
+            // Reabilita botão  
+            btnExecutar.disabled = false;  
+            btnExecutar.innerHTML = '<i class="bi bi-play-fill"></i> Executar Request';  
+        }  
+    });
+    
+    // ============================================  
+    // CONVERTER cURL  
+    // ============================================
+    
+    document.getElementById('btnConverterCurl').addEventListener('click', function() {  
+        const curlInput = document.getElementById('curlInput').value.trim();  
+        const errorArea = document.getElementById('curlErrorArea');  
+        const conversaoArea = document.getElementById('curlConversaoArea');
+        
+        errorArea.style.display = 'none';
+        
+        if (!curlInput) {  
+            errorArea.style.display = 'block';  
+            document.getElementById('curlErrorMessage').textContent = 'Por favor, cole um comando cURL.';  
+            return;  
+        }
+        
+        try {  
+            const parsed = parseCurl(curlInput);
+            
+            if (!parsed.url) {  
+                throw new Error('URL não encontrada no comando cURL.');  
+            }
+            
+            // Gera código Fetch  
+            const fetchCode = gerarCodigoFetch(parsed);  
+            document.getElementById('fetchOutput').value = fetchCode;
+            
+            // Gera código Axios  
+            const axiosCode = gerarCodigoAxios(parsed);  
+            document.getElementById('axiosOutput').value = axiosCode;
+            
+            // Gera código XHR  
+            const xhrCode = gerarCodigoXHR(parsed);  
+            document.getElementById('xhrOutput').value = xhrCode;
+            
+            conversaoArea.style.display = 'block';
+            
+            mostrarToast('✓ cURL convertido com sucesso!', 'success');
+            
+        } catch (error) {  
+            errorArea.style.display = 'block';  
+            document.getElementById('curlErrorMessage').textContent = error.message;  
+        }  
+    });
+    
+    function gerarCodigoFetch(parsed) {  
+        const headersStr = Object.keys(parsed.headers).length > 0  
+            ? ',\n  headers: ' + JSON.stringify(parsed.headers, null, 4).replace(/\n/g, '\n  ')  
+            : '';
+        
+        const bodyStr = parsed.body && parsed.method !== 'GET'  
+            ? ',\n  body: ' + (typeof parsed.body === 'string'   
+                ? `'${parsed.body}'`   
+                : JSON.stringify(parsed.body, null, 4).replace(/\n/g, '\n  '))  
+            : '';
+        
+        return `fetch('${parsed.url}', {  
+    method: '${parsed.method}'${headersStr}${bodyStr}  
+    })  
+    .then(response => response.json())  
+    .then(data => console.log(data))  
+    .catch(error => console.error('Error:', error));`;  
+    }
+    
+    function gerarCodigoAxios(parsed) {  
+        const headersStr = Object.keys(parsed.headers).length > 0  
+            ? ',\n  headers: ' + JSON.stringify(parsed.headers, null, 4).replace(/\n/g, '\n  ')  
+            : '';
+        
+        const bodyStr = parsed.body && parsed.method !== 'GET'  
+            ? ',\n  data: ' + (typeof parsed.body === 'string'   
+                ? `'${parsed.body}'`   
+                : JSON.stringify(parsed.body, null, 4).replace(/\n/g, '\n  '))  
+            : '';
+        
+        return `axios({  
+    method: '${parsed.method.toLowerCase()}',  
+    url: '${parsed.url}'${headersStr}${bodyStr}  
+    })  
+    .then(response => console.log(response.data))  
+    .catch(error => console.error('Error:', error));`;  
+    }
+    
+    function gerarCodigoXHR(parsed) {  
+        let code = `const xhr = new XMLHttpRequest();  
+    xhr.open('${parsed.method}', '${parsed.url}', true);
+    
+    `;
+        
+        // Headers  
+        if (Object.keys(parsed.headers).length > 0) {  
+            for (const [key, value] of Object.entries(parsed.headers)) {  
+                code += `xhr.setRequestHeader('${key}', '${value}');\n`;  
+            }  
+            code += '\n';  
+        }
+        
+        // Callbacks  
+        code += `xhr.onload = function() {  
+    if (xhr.status >= 200 && xhr.status < 300) {  
+        console.log('Response:', xhr.responseText);  
+    } else {  
+        console.error('Error:', xhr.status, xhr.statusText);  
+    }  
+    };
+    
+    xhr.onerror = function() {  
+    console.error('Request failed');  
+    };
+    
+    `;
+        
+        // Send  
+        if (parsed.body && parsed.method !== 'GET') {  
+            const bodyStr = typeof parsed.body === 'string'   
+                ? parsed.body   
+                : JSON.stringify(parsed.body);  
+            code += `xhr.send('${bodyStr}');`;  
+        } else {  
+            code += `xhr.send();`;  
+        }
+        
+        return code;  
+    }
+    
+    // ============================================  
+    // FORMATAR RESPONSE JSON  
+    // ============================================
+    
+    document.getElementById('btnFormatarResponse').addEventListener('click', function() {  
+        const responseTextarea = document.getElementById('curlResponse');  
+        const responseText = responseTextarea.value;
+        
+        try {  
+            const parsed = JSON.parse(responseText);  
+            responseTextarea.value = JSON.stringify(parsed, null, 2);  
+            mostrarToast('✓ JSON formatado!', 'success');  
+        } catch (error) {  
+            mostrarToast('⚠️ Response não é um JSON válido', 'warning');  
+        }  
+    });
+    
+    // ============================================  
+    // COPIAR RESPONSE  
+    // ============================================
+    
+    document.getElementById('btnCopyResponse').addEventListener('click', function() {  
+        const response = document.getElementById('curlResponse').value;  
+        navigator.clipboard.writeText(response).then(() => {  
+            mostrarFeedbackBotao(this, 'Copiado!');  
+        });  
+    });
+    
+    // ============================================  
+    // COPIAR CONVERSÕES  
+    // ============================================
+    
+    document.getElementById('btnCopyFetch').addEventListener('click', function() {  
+        const code = document.getElementById('fetchOutput').value;  
+        navigator.clipboard.writeText(code).then(() => {  
+            mostrarFeedbackBotao(this, 'Copiado!');  
+        });  
+    });
+    
+    document.getElementById('btnCopyAxios').addEventListener('click', function() {  
+        const code = document.getElementById('axiosOutput').value;  
+        navigator.clipboard.writeText(code).then(() => {  
+            mostrarFeedbackBotao(this, 'Copiado!');  
+        });  
+    });
+    
+    document.getElementById('btnCopyXhr').addEventListener('click', function() {  
+        const code = document.getElementById('xhrOutput').value;  
+        navigator.clipboard.writeText(code).then(() => {  
+            mostrarFeedbackBotao(this, 'Copiado!');  
+        });  
+    });
+    
+    // ============================================  
+    // LIMPAR cURL  
+    // ============================================
+    
+    document.getElementById('btnLimparCurl').addEventListener('click', function() {  
+        document.getElementById('curlInput').value = '';  
+        document.getElementById('curlInfoArea').style.display = 'none';  
+        document.getElementById('curlResponseArea').style.display = 'none';  
+        document.getElementById('curlConversaoArea').style.display = 'none';  
+        document.getElementById('curlErrorArea').style.display = 'none';  
+    });
+    
+    // ============================================  
+    // GERADOR DE cURL  
+    // ============================================
+    
+    document.getElementById('btnGerarCurl').addEventListener('click', function() {  
+        const metodo = document.getElementById('genMetodo').value;  
+        const url = document.getElementById('genUrl').value.trim();  
+        const headersText = document.getElementById('genHeaders').value.trim();  
+        const body = document.getElementById('genBody').value.trim();
+        
+        if (!url) {  
+            mostrarToast('⚠️ Por favor, informe a URL', 'warning');  
+            return;  
+        }
+        
+        let curl = `curl -X ${metodo} '${url}'`;
+        
+        // Adiciona headers  
+        if (headersText) {  
+            const headers = headersText.split('\n');  
+            headers.forEach(header => {  
+                const trimmed = header.trim();  
+                if (trimmed) {  
+                    curl += ` \\\n  -H '${trimmed}'`;  
+                }  
+            });  
+        }
+        
+        // Adiciona body  
+        if (body && metodo !== 'GET') {  
+            // Escapa aspas simples no body  
+            const escapedBody = body.replace(/'/g, "'\\''");  
+            curl += ` \\\n  -d '${escapedBody}'`;  
+        }
+        
+        document.getElementById('genCurlOutput').value = curl;  
+        document.getElementById('genCurlOutputArea').style.display = 'block';
+        
+        mostrarToast('✓ cURL gerado com sucesso!', 'success');  
+    });
+    
+    document.getElementById('btnCopyGenCurl').addEventListener('click', function() {  
+        const curl = document.getElementById('genCurlOutput').value;  
+        navigator.clipboard.writeText(curl).then(() => {  
+            mostrarFeedbackBotao(this, 'Copiado!');  
+        });  
+    });
+    
+    // ============================================  
+    // FUNÇÃO AUXILIAR - TOAST  
+    // ============================================
+    
+    function mostrarToast(mensagem, tipo = 'info') {  
+        // Cria elemento de toast se não existir  
+        let toastContainer = document.getElementById('toastContainer');  
+        if (!toastContainer) {  
+            toastContainer = document.createElement('div');  
+            toastContainer.id = 'toastContainer';  
+            toastContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999;';  
+            document.body.appendChild(toastContainer);  
+        }
+        
+        const toast = document.createElement('div');  
+        toast.className = `alert alert-${tipo === 'success' ? 'success' : tipo === 'warning' ? 'warning' : 'info'} alert-dismissible fade show`;  
+        toast.style.cssText = 'min-width: 250px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';  
+        toast.innerHTML = `  
+            ${mensagem}  
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>  
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        setTimeout(() => {  
+            toast.remove();  
+        }, 3000);  
+    }  
 });
 
