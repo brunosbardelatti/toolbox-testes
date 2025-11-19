@@ -1383,13 +1383,37 @@ function mostrarFeedbackBotao(botao, mensagem) {
     
     // ============================================  
     // EXECUTAR cURL  
-    // ============================================
+    // ============================================  
+    
+    // Função auxiliar para detectar erro de CORS
+    function isCorsError(error) {
+        const errorMsg = error.message.toLowerCase();
+        return errorMsg.includes('cors') || 
+               errorMsg.includes('failed to fetch') || 
+               errorMsg.includes('networkerror') ||
+               errorMsg.includes('network error') ||
+               error.name === 'TypeError' && errorMsg.includes('fetch');
+    }
+    
+    // Função auxiliar para usar proxy CORS
+    function usarProxyCors(url) {
+        // Remove protocolo se já tiver proxy
+        if (url.includes('allorigins.win') || url.includes('corsproxy.io') || url.includes('cors-anywhere')) {
+            return url;
+        }
+        
+        // Usa allorigins.win como proxy (gratuito e confiável)
+        // Formato: https://api.allorigins.win/raw?url=ENCODED_URL
+        const encodedUrl = encodeURIComponent(url);
+        return `https://api.allorigins.win/raw?url=${encodedUrl}`;
+    }
     
     document.getElementById('btnExecutarCurl').addEventListener('click', async function() {  
         const curlInput = document.getElementById('curlInput').value.trim();  
         const errorArea = document.getElementById('curlErrorArea');  
         const responseArea = document.getElementById('curlResponseArea');  
-        const btnExecutar = this;
+        const btnExecutar = this;  
+        const usarProxy = document.getElementById('usarProxyCors').checked;
         
         errorArea.style.display = 'none';  
         document.getElementById('curlConversaoArea').style.display = 'none';
@@ -1414,11 +1438,26 @@ function mostrarFeedbackBotao(botao, mensagem) {
             // Marca tempo inicial  
             const startTime = performance.now();
             
+            // Determina URL final (com ou sem proxy)
+            let urlFinal = parsed.url;
+            if (usarProxy) {
+                urlFinal = usarProxyCors(parsed.url);
+            }
+            
             // Prepara opções do fetch  
             const options = {  
                 method: parsed.method,  
                 headers: parsed.headers  
             };
+            
+            // Remove headers que podem causar problemas com proxy
+            if (usarProxy) {
+                // Remove headers de host e origin que podem interferir
+                delete options.headers['host'];
+                delete options.headers['Host'];
+                delete options.headers['origin'];
+                delete options.headers['Origin'];
+            }
             
             // Adiciona body se não for GET  
             if (parsed.method !== 'GET' && parsed.body) {  
@@ -1426,30 +1465,57 @@ function mostrarFeedbackBotao(botao, mensagem) {
             }
             
             // Executa request  
-            const response = await fetch(parsed.url, options);
+            let response;
+            let tentouComProxy = usarProxy;
+            try {
+                response = await fetch(urlFinal, options);
+            } catch (fetchError) {
+                // Se der erro e não estava usando proxy, tenta com proxy automaticamente
+                if (!tentouComProxy && isCorsError(fetchError)) {
+                    urlFinal = usarProxyCors(parsed.url);
+                    // Remove headers que podem causar problemas com proxy
+                    delete options.headers['host'];
+                    delete options.headers['Host'];
+                    delete options.headers['origin'];
+                    delete options.headers['Origin'];
+                    tentouComProxy = true;
+                    response = await fetch(urlFinal, options);
+                } else {
+                    throw fetchError;
+                }
+            }
             
             // Calcula tempo  
             const endTime = performance.now();  
             const duration = (endTime - startTime).toFixed(2);
+            
+            // Extrai body
+            let responseBody;
+            let contentType = '';
+            
+            try {
+                // Tenta obter content-type do header
+                contentType = response.headers.get('content-type') || '';
+                
+                // Tenta parsear como JSON primeiro
+                const textBody = await response.text();
+                try {
+                    responseBody = JSON.parse(textBody);
+                    responseBody = JSON.stringify(responseBody, null, 2);
+                    contentType = 'application/json';
+                } catch {
+                    // Se não for JSON, usa o texto
+                    responseBody = textBody;
+                }
+            } catch (bodyError) {
+                responseBody = 'Erro ao ler body da resposta: ' + bodyError.message;
+            }
             
             // Extrai headers da response  
             const responseHeaders = {};  
             response.headers.forEach((value, key) => {  
                 responseHeaders[key] = value;  
             });
-            
-            // Extrai body  
-            const contentType = response.headers.get('content-type') || '';  
-            let responseBody;
-            
-            if (contentType.includes('application/json')) {  
-                responseBody = await response.json();  
-                responseBody = JSON.stringify(responseBody, null, 2);  
-            } else if (contentType.includes('text/')) {  
-                responseBody = await response.text();  
-            } else {  
-                responseBody = await response.text();  
-            }
             
             // Mostra resultado  
             const statusBadge = document.getElementById('responseStatus');  
@@ -1462,17 +1528,34 @@ function mostrarFeedbackBotao(botao, mensagem) {
             
             responseArea.style.display = 'block';
             
-            mostrarToast('✓ Request executada com sucesso!', 'success');
+            // Mostra aviso se usou proxy
+            if (tentouComProxy || urlFinal.includes('allorigins.win')) {
+                mostrarToast('✓ Request executada com sucesso! (via proxy CORS)', 'success');
+            } else {
+                mostrarToast('✓ Request executada com sucesso!', 'success');
+            }
             
         } catch (error) {  
             errorArea.style.display = 'block';  
-            document.getElementById('curlErrorMessage').textContent =   
-                'Erro ao executar request: ' + error.message +   
-                '\n\nNota: Pode haver problemas de CORS. Use uma extensão de CORS ou proxy.';  
+            
+            let mensagemErro = 'Erro ao executar request: ' + error.message;
+            
+            // Detecta erro de CORS e fornece instruções
+            if (isCorsError(error)) {
+                mensagemErro += '\n\n⚠️ ERRO DE CORS DETECTADO\n\n';
+                mensagemErro += 'Soluções possíveis:\n';
+                mensagemErro += '1. ✅ Ative a opção "Usar Proxy CORS" acima e tente novamente\n';
+                mensagemErro += '2. 🔧 Use uma extensão de navegador (ex: CORS Unblock, CORS Toggle)\n';
+                mensagemErro += '3. 🌐 Configure um proxy CORS local (cors-anywhere)\n';
+                mensagemErro += '4. 🔐 Se você controla a API, adicione CORS headers no servidor\n';
+                mensagemErro += '\nNota: O proxy CORS público pode ter limitações de taxa e não é recomendado para produção.';
+            }
+            
+            document.getElementById('curlErrorMessage').textContent = mensagemErro;
         } finally {  
             // Reabilita botão  
             btnExecutar.disabled = false;  
-            btnExecutar.innerHTML = '<i class="bi bi-play-fill"></i> Executar Request';  
+            btnExecutar.innerHTML = '▶️ Executar Request';  
         }  
     });
     
@@ -1511,6 +1594,18 @@ function mostrarFeedbackBotao(botao, mensagem) {
             // Gera código XHR  
             const xhrCode = gerarCodigoXHR(parsed);  
             document.getElementById('xhrOutput').value = xhrCode;
+            
+            // Gera código Node.js  
+            const nodejsCode = gerarCodigoNodeJS(parsed);  
+            document.getElementById('nodejsOutput').value = nodejsCode;
+            
+            // Gera código Playwright  
+            const playwrightCode = gerarCodigoPlaywright(parsed);  
+            document.getElementById('playwrightOutput').value = playwrightCode;
+            
+            // Gera código Robot Framework  
+            const robotCode = gerarCodigoRobotFramework(parsed);  
+            document.getElementById('robotOutput').value = robotCode;
             
             conversaoArea.style.display = 'block';
             
@@ -1602,6 +1697,149 @@ function mostrarFeedbackBotao(botao, mensagem) {
         return code;  
     }
     
+    function gerarCodigoNodeJS(parsed) {
+        // Opção 1: Usando fetch nativo (Node.js 18+)
+        const headersStr = Object.keys(parsed.headers).length > 0  
+            ? ',\n  headers: ' + JSON.stringify(parsed.headers, null, 4).replace(/\n/g, '\n  ')  
+            : '';
+        
+        const bodyStr = parsed.body && parsed.method !== 'GET'  
+            ? ',\n  body: ' + (typeof parsed.body === 'string'   
+                ? `'${parsed.body.replace(/'/g, "\\'")}'`   
+                : JSON.stringify(parsed.body, null, 4).replace(/\n/g, '\n  '))  
+            : '';
+        
+        // Gera código usando fetch (Node.js 18+) e fallback para axios
+        let code = `// Opção 1: Usando fetch nativo (Node.js 18+)\n`;
+        code += `const response = await fetch('${parsed.url}', {\n  method: '${parsed.method}'${headersStr}${bodyStr}\n});\n\n`;
+        code += `const data = await response.json();\nconsole.log(data);\n\n`;
+        
+        // Opção 2: Axios
+        const axiosHeadersStr = Object.keys(parsed.headers).length > 0  
+            ? ',\n  headers: ' + JSON.stringify(parsed.headers, null, 6).replace(/\n/g, '\n  ')  
+            : '';
+        const axiosDataStr = parsed.body && parsed.method !== 'GET'  
+            ? ',\n  data: ' + (typeof parsed.body === 'string'   
+                ? `'${parsed.body.replace(/'/g, "\\'")}'`   
+                : JSON.stringify(parsed.body, null, 6).replace(/\n/g, '\n  '))  
+            : '';
+        
+        code += `// Opção 2: Usando axios (npm install axios)\n`;
+        code += `// const axios = require('axios');\n`;
+        code += `// const response = await axios({\n`;
+        code += `//   method: '${parsed.method.toLowerCase()}',\n`;
+        code += `//   url: '${parsed.url}'${axiosHeadersStr}${axiosDataStr}\n`;
+        code += `// });\n`;
+        code += `// console.log(response.data);`;
+        
+        return code;
+    }
+    
+    function gerarCodigoPlaywright(parsed) {
+        const headersStr = Object.keys(parsed.headers).length > 0  
+            ? ',\n      headers: ' + JSON.stringify(parsed.headers, null, 8).replace(/\n/g, '\n      ')  
+            : '';
+        
+        const bodyStr = parsed.body && parsed.method !== 'GET'  
+            ? ',\n      data: ' + (typeof parsed.body === 'string'   
+                ? `'${parsed.body.replace(/'/g, "\\'")}'`   
+                : JSON.stringify(parsed.body, null, 8).replace(/\n/g, '\n      '))  
+            : '';
+        
+        let code = `const { test, expect } = require('@playwright/test');\n\ntest('API Request', async ({ request }) => {\n  const response = await request.${parsed.method.toLowerCase()}('${parsed.url}'${headersStr}${bodyStr});\n  \n  expect(response.ok()).toBeTruthy();\n  \n  const responseBody = await response.json();\n  console.log('Response:', responseBody);\n  \n  // Adicione suas asserções aqui\n  // expect(responseBody).toHaveProperty('key', 'value');\n});`;
+        
+        return code;
+    }
+    
+    function gerarCodigoRobotFramework(parsed) {
+        // Extrai base URL e endpoint
+        let baseUrl = '';
+        let endpoint = '';
+        try {
+            const urlObj = new URL(parsed.url);
+            baseUrl = urlObj.protocol + '//' + urlObj.host;
+            endpoint = urlObj.pathname + urlObj.search;
+        } catch {
+            baseUrl = parsed.url;
+            endpoint = '/';
+        }
+        
+        // Prepara headers
+        let headersVar = '';
+        let headersStr = '';
+        if (Object.keys(parsed.headers).length > 0) {
+            // Converte headers para formato Robot Framework (dicionário Python)
+            // Formato: &{HEADERS}    key1=value1    key2=value2
+            const headersList = Object.entries(parsed.headers)
+                .map(([k, v]) => k + '=' + v.replace(/=/g, '\\='))
+                .join('    ');
+            headersVar = '&{HEADERS}    ' + headersList;
+            headersStr = '    headers=${HEADERS}';
+        }
+        
+        // Prepara body
+        let bodyVar = '';
+        let bodyStr = '';
+        if (parsed.body && parsed.method !== 'GET') {
+            if (typeof parsed.body === 'string') {
+                // Tenta parsear como JSON, se não conseguir, usa como string
+                try {
+                    const jsonBody = JSON.parse(parsed.body);
+                    bodyVar = '&{BODY}    ' + JSON.stringify(jsonBody);
+                    bodyStr = '    json=${BODY}';
+                } catch {
+                    bodyVar = '${BODY}    ' + parsed.body.replace(/\$/g, '\\$');
+                    bodyStr = '    data=${BODY}';
+                }
+            } else {
+                bodyVar = '&{BODY}    ' + JSON.stringify(parsed.body);
+                bodyStr = '    json=${BODY}';
+            }
+        }
+        
+        // Determina método HTTP em maiúsculas
+        const methodUpper = parsed.method.toUpperCase();
+        
+        // Gera código Robot Framework
+        let code = '*** Settings ***\n';
+        code += 'Library    RequestsLibrary\n';
+        code += 'Library    Collections\n\n';
+        
+        code += '*** Variables ***\n';
+        code += '${BASE_URL}    ' + baseUrl + '\n';
+        if (headersVar) {
+            code += headersVar + '\n';
+        }
+        if (bodyVar) {
+            code += bodyVar + '\n';
+        }
+        code += '\n';
+        
+        code += '*** Test Cases ***\n';
+        code += 'API Request From cURL\n';
+        code += '    Create Session    api    ${BASE_URL}\n';
+        
+        // Monta a linha de request
+        code += '    ${response}=    ' + methodUpper + ' Request    api    ' + endpoint;
+        if (bodyStr) {
+            code += '\n    ...    ' + bodyStr.trim();
+        }
+        if (headersStr) {
+            code += '\n    ...    ' + headersStr.trim();
+        }
+        code += '\n\n';
+        
+        code += '    Status Should Be    200    ${response}\n';
+        code += '    ${json_response}=    Set Variable    ${response.json()}\n';
+        code += '    Log    Response: ${json_response}\n';
+        code += '    \n';
+        code += '    # Adicione suas validações aqui\n';
+        code += '    # Dictionary Should Contain Key    ${json_response}    key\n';
+        code += '    # Should Be Equal    ${json_response[\'key\']}    expected_value';
+        
+        return code;
+    }
+    
     // ============================================  
     // FORMATAR RESPONSE JSON  
     // ============================================
@@ -1650,6 +1888,27 @@ function mostrarFeedbackBotao(botao, mensagem) {
     
     document.getElementById('btnCopyXhr').addEventListener('click', function() {  
         const code = document.getElementById('xhrOutput').value;  
+        navigator.clipboard.writeText(code).then(() => {  
+            mostrarFeedbackBotao(this, 'Copiado!');  
+        });  
+    });
+    
+    document.getElementById('btnCopyNodejs').addEventListener('click', function() {  
+        const code = document.getElementById('nodejsOutput').value;  
+        navigator.clipboard.writeText(code).then(() => {  
+            mostrarFeedbackBotao(this, 'Copiado!');  
+        });  
+    });
+    
+    document.getElementById('btnCopyPlaywright').addEventListener('click', function() {  
+        const code = document.getElementById('playwrightOutput').value;  
+        navigator.clipboard.writeText(code).then(() => {  
+            mostrarFeedbackBotao(this, 'Copiado!');  
+        });  
+    });
+    
+    document.getElementById('btnCopyRobot').addEventListener('click', function() {  
+        const code = document.getElementById('robotOutput').value;  
         navigator.clipboard.writeText(code).then(() => {  
             mostrarFeedbackBotao(this, 'Copiado!');  
         });  
@@ -1713,6 +1972,17 @@ function mostrarFeedbackBotao(botao, mensagem) {
         navigator.clipboard.writeText(curl).then(() => {  
             mostrarFeedbackBotao(this, 'Copiado!');  
         });  
+    });
+    
+    // Limpar campos do gerador de cURL
+    document.getElementById('btnLimparGenCurl').addEventListener('click', function() {
+        document.getElementById('genMetodo').value = 'GET';
+        document.getElementById('genUrl').value = '';
+        document.getElementById('genHeaders').value = '';
+        document.getElementById('genBody').value = '';
+        document.getElementById('genCurlOutput').value = '';
+        document.getElementById('genCurlOutputArea').style.display = 'none';
+        mostrarToast('✓ Campos limpos!', 'success');
     });
     
     // ============================================  

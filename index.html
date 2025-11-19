@@ -750,6 +750,19 @@
             -d '{&quot;chave&quot;: &quot;valor&quot;}'"></textarea>  
                                 <small class="text-muted">Cole o comando cURL completo. Suporta GET, POST, PUT, DELETE, PATCH.</small>  
                             </div>
+                            
+                            <!-- Opções de CORS -->  
+                            <div class="mb-3">  
+                                <div class="form-check form-switch">  
+                                    <input class="form-check-input" type="checkbox" id="usarProxyCors" checked>  
+                                    <label class="form-check-label" for="usarProxyCors">  
+                                        <strong>Usar Proxy CORS</strong> (recomendado para evitar erros de CORS)  
+                                    </label>  
+                                </div>  
+                                <small class="text-muted d-block mt-1">  
+                                    Se ativado, a requisição será feita através de um proxy CORS público para contornar restrições de origem cruzada.  
+                                </small>  
+                            </div>
             
                             <!-- Botões de Ação -->  
                             <div class="d-flex flex-wrap gap-2 mb-3">  
@@ -803,9 +816,9 @@
                                             data-bs-target="#responseHeaders" aria-expanded="false">  
                                         📋 Ver Headers da Response  
                                     </button>  
-                                    <div class="collapse mt-2" id="responseHeaders">  
-                                        <pre class="bg-light p-2 rounded" id="responseHeadersContent" style="max-height: 150px; overflow-y: auto;"></pre>  
-                                    </div>  
+                                    <div class="collapse mt-2" id="responseHeaders">
+                                        <pre class="p-2 rounded" id="responseHeadersContent" style="max-height: 150px; overflow-y: auto;"></pre>
+                                    </div>
                                 </div>
             
                                 <!-- Body da Response -->  
@@ -822,7 +835,19 @@
                                 <label class="form-label fw-bold">Código Convertido:</label>  
                                 <ul class="nav nav-tabs mb-2" id="conversionTabs" role="tablist">  
                                     <li class="nav-item" role="presentation">  
-                                        <button class="nav-link active" id="fetch-tab" data-bs-toggle="tab"   
+                                        <button class="nav-link active" id="playwright-tab" data-bs-toggle="tab"   
+                                                data-bs-target="#playwrightCode" type="button">Playwright</button>  
+                                    </li>  
+                                    <li class="nav-item" role="presentation">  
+                                        <button class="nav-link" id="robot-tab" data-bs-toggle="tab"   
+                                                data-bs-target="#robotCode" type="button">Robot Framework</button>  
+                                    </li>  
+                                    <li class="nav-item" role="presentation">  
+                                        <button class="nav-link" id="nodejs-tab" data-bs-toggle="tab"   
+                                                data-bs-target="#nodejsCode" type="button">Node.js</button>  
+                                    </li>  
+                                    <li class="nav-item" role="presentation">  
+                                        <button class="nav-link" id="fetch-tab" data-bs-toggle="tab"   
                                                 data-bs-target="#fetchCode" type="button">Fetch API</button>  
                                     </li>  
                                     <li class="nav-item" role="presentation">  
@@ -835,7 +860,25 @@
                                     </li>  
                                 </ul>  
                                 <div class="tab-content">  
-                                    <div class="tab-pane fade show active" id="fetchCode">  
+                                    <div class="tab-pane fade show active" id="playwrightCode">  
+                                        <textarea class="form-control font-monospace" id="playwrightOutput" rows="10" readonly></textarea>  
+                                        <button type="button" class="btn btn-sm btn-utility mt-2" id="btnCopyPlaywright">  
+                                            📋 Copiar  
+                                        </button>  
+                                    </div>  
+                                    <div class="tab-pane fade" id="robotCode">  
+                                        <textarea class="form-control font-monospace" id="robotOutput" rows="10" readonly></textarea>  
+                                        <button type="button" class="btn btn-sm btn-utility mt-2" id="btnCopyRobot">  
+                                            📋 Copiar  
+                                        </button>  
+                                    </div>  
+                                    <div class="tab-pane fade" id="nodejsCode">  
+                                        <textarea class="form-control font-monospace" id="nodejsOutput" rows="10" readonly></textarea>  
+                                        <button type="button" class="btn btn-sm btn-utility mt-2" id="btnCopyNodejs">  
+                                            📋 Copiar  
+                                        </button>  
+                                    </div>  
+                                    <div class="tab-pane fade" id="fetchCode">  
                                         <textarea class="form-control font-monospace" id="fetchOutput" rows="10" readonly></textarea>  
                                         <button type="button" class="btn btn-sm btn-utility mt-2" id="btnCopyFetch">  
                                             📋 Copiar  
@@ -917,9 +960,14 @@
                                 <div class="col-12" id="genCurlOutputArea" style="display: none;">  
                                     <label class="form-label fw-bold">cURL Gerado:</label>  
                                     <textarea class="form-control font-monospace" id="genCurlOutput" rows="8" readonly></textarea>  
-                                    <button type="button" class="btn btn-sm btn-utility mt-2" id="btnCopyGenCurl">  
-                                        📋 Copiar cURL  
-                                    </button>  
+                                    <div class="d-flex gap-2 mt-2">
+                                        <button type="button" class="btn btn-sm btn-utility" id="btnCopyGenCurl">  
+                                            📋 Copiar cURL  
+                                        </button>  
+                                        <button type="button" class="btn btn-sm btn-utility" id="btnLimparGenCurl">  
+                                            🗑️ Limpar  
+                                        </button>  
+                                    </div>
                                 </div>  
                             </div>  
                         </div>  
