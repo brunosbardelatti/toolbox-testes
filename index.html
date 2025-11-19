@@ -91,8 +91,8 @@
                             <button type="button" class="btn btn-secondary m-1" id="btnUppercase">MAIÚSCULAS</button>
                             <button type="button" class="btn btn-secondary m-1" id="btnLowercase">minúsculas</button>
                             <button type="button" class="btn btn-secondary m-1" id="btnTitlecase">Primeira Letra Maiúscula</button>
-                            <button type="button" class="btn btn-secondary m-1" id="btnCopyText">Copiar Texto</button>
-                            <button type="button" class="btn btn-secondary m-1" id="btnClearText">Limpar</button>
+                            <button type="button" class="btn btn-utility m-1" id="btnCopyText">📋 Copiar</button>
+                            <button type="button" class="btn btn-utility m-1" id="btnClearText">🗑️ Limpar</button>
                         </div>
                     </div>
                 </div>
@@ -113,9 +113,9 @@
                             <textarea class="form-control" id="base64Output" rows="8" placeholder="Resultado aparecerá aqui..."></textarea>
                         </div>
                         <div class="d-flex flex-wrap gap-2">
-                            <button type="button" class="btn btn-primary" id="btnBase64Encode">Encode (Texto -> Base64)</button>
-                            <button type="button" class="btn btn-primary" id="btnBase64Decode">Decode (Base64 -> Texto)</button>
-                            <button type="button" class="btn btn-secondary" id="btnBase64Swap">Trocar (Swap)</button>
+                            <button type="button" class="btn btn-secondary" id="btnBase64Encode">🔒 Encode</button>
+                            <button type="button" class="btn btn-secondary" id="btnBase64Decode">🔓 Decode</button>
+                            <button type="button" class="btn btn-utility" id="btnBase64Swap">🔄 Trocar</button>
                         </div>
                     </div>
 
@@ -131,8 +131,8 @@
                             <textarea class="form-control" id="urlOutput" rows="8" placeholder="Resultado aparecerá aqui..."></textarea>
                         </div>
                         <div class="d-flex flex-wrap gap-2">
-                            <button type="button" class="btn btn-primary" id="btnUrlEncode">Encode (URL)</button>
-                            <button type="button" class="btn btn-primary" id="btnUrlDecode">Decode (URL)</button>
+                            <button type="button" class="btn btn-secondary" id="btnUrlEncode">🔒 Encode</button>
+                            <button type="button" class="btn btn-secondary" id="btnUrlDecode">🔓 Decode</button>
                         </div>
                     </div>
                 </div>
@@ -147,10 +147,10 @@
                     <textarea class="form-control" id="jsonInput" rows="20" placeholder='{"exemplo": "json", "array": [1, 2, 3]}'></textarea>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
-                    <button type="button" class="btn btn-primary" id="btnJsonPrettify">Prettify / Formatar</button>
-                    <button type="button" class="btn btn-primary" id="btnJsonMinify">Minify / Compactar</button>
-                    <button type="button" class="btn btn-secondary" id="btnJsonCopy">Copiar</button>
-                    <button type="button" class="btn btn-secondary" id="btnJsonClear">Limpar</button>
+                    <button type="button" class="btn btn-primary" id="btnJsonPrettify">✨ Formatar</button>
+                    <button type="button" class="btn btn-secondary" id="btnJsonMinify">📦 Compactar</button>
+                    <button type="button" class="btn btn-utility" id="btnJsonCopy">📋 Copiar</button>
+                    <button type="button" class="btn btn-utility" id="btnJsonClear">🗑️ Limpar</button>
                 </div>
             </div>
 
@@ -171,9 +171,9 @@
                                     <label class="form-label fw-bold">CPF</label>
                                     <div class="input-group mb-2">
                                         <input type="text" class="form-control" id="cpfOutput" readonly placeholder="CPF gerado aparecerá aqui">
-                                        <button class="btn btn-outline-secondary" type="button" id="btnCopyCpf" title="Copiar CPF">📋</button>
+                                        <button class="btn btn-utility" type="button" id="btnCopyCpf" title="Copiar CPF">📋</button>
                                     </div>
-                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateCpf">Gerar CPF</button>
+                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateCpf">✨ Gerar CPF</button>
                                 </div>
                                 
                                 <!-- Gerador CNPJ -->
@@ -181,9 +181,9 @@
                                     <label class="form-label fw-bold">CNPJ</label>
                                     <div class="input-group mb-2">
                                         <input type="text" class="form-control" id="cnpjOutput" readonly placeholder="CNPJ gerado aparecerá aqui">
-                                        <button class="btn btn-outline-secondary" type="button" id="btnCopyCnpj" title="Copiar CNPJ">📋</button>
+                                        <button class="btn btn-utility" type="button" id="btnCopyCnpj" title="Copiar CNPJ">📋</button>
                                     </div>
-                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateCnpj">Gerar CNPJ</button>
+                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateCnpj">✨ Gerar CNPJ</button>
                                 </div>
                             </div>
                         </div>
@@ -201,9 +201,9 @@
                                     <label class="form-label fw-bold">Email</label>
                                     <div class="input-group mb-2">
                                         <input type="text" class="form-control" id="emailOutput" readonly placeholder="Email gerado aparecerá aqui">
-                                        <button class="btn btn-outline-secondary" type="button" id="btnCopyEmail" title="Copiar Email">📋</button>
+                                        <button class="btn btn-utility" type="button" id="btnCopyEmail" title="Copiar Email">📋</button>
                                     </div>
-                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateEmail">Gerar Email</button>
+                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateEmail">✨ Gerar Email</button>
                                 </div>
                                 
                                 <!-- Gerador Telefone -->
@@ -211,9 +211,9 @@
                                     <label class="form-label fw-bold">Telefone</label>
                                     <div class="input-group mb-2">
                                         <input type="text" class="form-control" id="telefoneOutput" readonly placeholder="Telefone gerado aparecerá aqui">
-                                        <button class="btn btn-outline-secondary" type="button" id="btnCopyTelefone" title="Copiar Telefone">📋</button>
+                                        <button class="btn btn-utility" type="button" id="btnCopyTelefone" title="Copiar Telefone">📋</button>
                                     </div>
-                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateTelefone">Gerar Telefone</button>
+                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateTelefone">✨ Gerar Telefone</button>
                                 </div>
                             </div>
                         </div>
@@ -231,9 +231,9 @@
                                     <label class="form-label fw-bold">UUID/GUID</label>
                                     <div class="input-group mb-2">
                                         <input type="text" class="form-control" id="uuidOutput" readonly placeholder="UUID gerado aparecerá aqui">
-                                        <button class="btn btn-outline-secondary" type="button" id="btnCopyUuid" title="Copiar UUID">📋</button>
+                                        <button class="btn btn-utility" type="button" id="btnCopyUuid" title="Copiar UUID">📋</button>
                                     </div>
-                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateUuid">Gerar UUID</button>
+                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateUuid">✨ Gerar UUID</button>
                                 </div>
                                 
                                 <!-- Gerador CEP -->
@@ -241,9 +241,9 @@
                                     <label class="form-label fw-bold">CEP</label>
                                     <div class="input-group mb-2">
                                         <input type="text" class="form-control" id="cepOutput" readonly placeholder="CEP gerado aparecerá aqui">
-                                        <button class="btn btn-outline-secondary" type="button" id="btnCopyCep" title="Copiar CEP">📋</button>
+                                        <button class="btn btn-utility" type="button" id="btnCopyCep" title="Copiar CEP">📋</button>
                                     </div>
-                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateCep">Gerar CEP</button>
+                                    <button type="button" class="btn btn-primary w-100" id="btnGenerateCep">✨ Gerar CEP</button>
                                 </div>
                             </div>
                         </div>
@@ -259,12 +259,12 @@
                                 <label class="form-label fw-bold">Data/Hora</label>
                                 <div class="input-group mb-2">
                                     <input type="text" class="form-control" id="dataOutput" readonly placeholder="Data/Hora gerada aparecerá aqui">
-                                    <button class="btn btn-outline-secondary" type="button" id="btnCopyData" title="Copiar Data/Hora">📋</button>
+                                    <button class="btn btn-utility" type="button" id="btnCopyData" title="Copiar Data/Hora">📋</button>
                                 </div>
                                 <div class="d-grid gap-2 d-md-flex">
-                                    <button type="button" class="btn btn-primary flex-fill" id="btnGenerateDataBR">BR</button>
-                                    <button type="button" class="btn btn-primary flex-fill" id="btnGenerateDataISO">ISO</button>
-                                    <button type="button" class="btn btn-primary flex-fill" id="btnGenerateTimestamp">Timestamp</button>
+                                    <button type="button" class="btn btn-primary flex-fill" id="btnGenerateDataBR">✨ BR</button>
+                                    <button type="button" class="btn btn-primary flex-fill" id="btnGenerateDataISO">✨ ISO</button>
+                                    <button type="button" class="btn btn-primary flex-fill" id="btnGenerateTimestamp">✨ Timestamp</button>
                                 </div>
                             </div>
                         </div>
@@ -280,9 +280,9 @@
                                 <label class="form-label fw-bold">Nome Completo</label>
                                 <div class="input-group mb-2">
                                     <input type="text" class="form-control" id="nomeOutput" readonly placeholder="Nome completo gerado aparecerá aqui">
-                                    <button class="btn btn-outline-secondary" type="button" id="btnCopyNome" title="Copiar Nome">📋</button>
+                                    <button class="btn btn-utility" type="button" id="btnCopyNome" title="Copiar Nome">📋</button>
                                 </div>
-                                <button type="button" class="btn btn-primary w-100" id="btnGenerateNome">Gerar Nome Completo</button>
+                                <button type="button" class="btn btn-primary w-100" id="btnGenerateNome">✨ Gerar Nome Completo</button>
                             </div>
                         </div>
                     </div>
@@ -413,9 +413,9 @@
 
                 <!-- Botões de Ação -->
                 <div class="mt-4 d-flex gap-2 justify-content-end">
-                    <button type="button" class="btn btn-primary" id="btnGerarPF">Gerar Pessoa Física</button>
-                    <button type="button" class="btn btn-success" id="btnCopiarPF">Copiar Todos os Dados</button>
-                    <button type="button" class="btn btn-info" id="btnCopiarPFJson">Copiar como JSON</button>
+                    <button type="button" class="btn btn-primary" id="btnGerarPF">✨ Gerar Pessoa Física</button>
+                    <button type="button" class="btn btn-utility" id="btnCopiarPF">📋 Copiar Dados</button>
+                    <button type="button" class="btn btn-secondary" id="btnCopiarPFJson">{ } Copiar JSON</button>
                 </div>
             </div>
 
@@ -551,9 +551,9 @@
 
                 <!-- Botões de Ação -->
                 <div class="mt-4 d-flex gap-2 justify-content-end">
-                    <button type="button" class="btn btn-primary" id="btnGerarPJ">Gerar Pessoa Jurídica</button>
-                    <button type="button" class="btn btn-success" id="btnCopiarPJ">Copiar Todos os Dados</button>
-                    <button type="button" class="btn btn-info" id="btnCopiarPJJson">Copiar como JSON</button>
+                    <button type="button" class="btn btn-primary" id="btnGerarPJ">✨ Gerar Pessoa Jurídica</button>
+                    <button type="button" class="btn btn-utility" id="btnCopiarPJ">📋 Copiar Dados</button>
+                    <button type="button" class="btn btn-secondary" id="btnCopiarPJJson">{ } Copiar JSON</button>
                 </div>
             </div>  
 
@@ -571,8 +571,8 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <button type="button" class="btn btn-primary" id="btnComparar">Comparar</button>
-                    <button type="button" class="btn btn-secondary" id="btnLimparComparador">Limpar</button>
+                    <button type="button" class="btn btn-primary" id="btnComparar">🔍 Comparar</button>
+                    <button type="button" class="btn btn-utility" id="btnLimparComparador">🗑️ Limpar</button>
                 </div>
                 <div id="comparadorResultado" class="mt-3"></div>
             </div>
@@ -587,7 +587,7 @@
                             <label for="jwtInput" class="form-label">Cole o token JWT:</label>
                             <textarea class="form-control" id="jwtInput" rows="4" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></textarea>
                         </div>
-                        <button type="button" class="btn btn-primary mb-3" id="btnDecodificarJwt">Decodificar JWT</button>
+                        <button type="button" class="btn btn-primary mb-3" id="btnDecodificarJwt">🔓 Decodificar JWT</button>
                         <div id="jwtResultado"></div>
                     </div>
 
@@ -599,15 +599,15 @@
                             <textarea class="form-control" id="hashInput" rows="4" placeholder="Digite o texto aqui..."></textarea>
                         </div>
                         <div class="d-flex flex-wrap gap-2 mb-3">
-                            <button type="button" class="btn btn-primary" id="btnHashMD5">MD5</button>
-                            <button type="button" class="btn btn-primary" id="btnHashSHA256">SHA-256</button>
-                            <button type="button" class="btn btn-primary" id="btnHashSHA512">SHA-512</button>
+                            <button type="button" class="btn btn-secondary" id="btnHashMD5">MD5</button>
+                            <button type="button" class="btn btn-secondary" id="btnHashSHA256">SHA-256</button>
+                            <button type="button" class="btn btn-secondary" id="btnHashSHA512">SHA-512</button>
                         </div>
                         <div class="mb-3">
                             <label for="hashOutput" class="form-label">Hash gerado:</label>
                             <textarea class="form-control" id="hashOutput" rows="3" readonly placeholder="Hash aparecerá aqui..."></textarea>
                         </div>
-                        <button type="button" class="btn btn-secondary" id="btnCopyHash">Copiar Hash</button>
+                        <button type="button" class="btn btn-utility" id="btnCopyHash">📋 Copiar</button>
                     </div>
                 </div>
             </div>
@@ -638,7 +638,7 @@
                     <label for="regexTestText" class="form-label">Texto para testar:</label>
                     <textarea class="form-control" id="regexTestText" rows="8" placeholder="Digite ou cole o texto para testar a expressão regular..."></textarea>
                 </div>
-                <button type="button" class="btn btn-primary mb-3" id="btnTestarRegex">Testar Regex</button>
+                <button type="button" class="btn btn-primary mb-3" id="btnTestarRegex">🔍 Testar Regex</button>
                 <div id="regexResultado"></div>
             </div>
 
@@ -666,17 +666,17 @@
             
                             <!-- Botões de Ação -->  
                             <div class="d-flex flex-wrap gap-2 mb-3">  
-                                <button type="button" class="btn btn-success" id="btnValidarCurl">  
-                                    <i class="bi bi-check-circle"></i> Validar Estrutura  
+                                <button type="button" class="btn btn-secondary" id="btnValidarCurl">  
+                                    ✅ Validar Estrutura  
                                 </button>  
                                 <button type="button" class="btn btn-primary" id="btnExecutarCurl">  
-                                    <i class="bi bi-play-fill"></i> Executar Request  
+                                    ▶️ Executar Request  
                                 </button>  
-                                <button type="button" class="btn btn-info" id="btnConverterCurl">  
-                                    <i class="bi bi-code-slash"></i> Converter para Fetch/Axios  
+                                <button type="button" class="btn btn-secondary" id="btnConverterCurl">  
+                                    🔄 Converter Código  
                                 </button>  
-                                <button type="button" class="btn btn-warning" id="btnLimparCurl">  
-                                    <i class="bi bi-trash"></i> Limpar  
+                                <button type="button" class="btn btn-utility" id="btnLimparCurl">  
+                                    🗑️ Limpar  
                                 </button>  
                             </div>
             
@@ -705,16 +705,16 @@
                                 <div class="mb-2 d-flex align-items-center gap-2">  
                                     <span class="badge" id="responseStatus"></span>  
                                     <span class="text-muted" id="responseTime"></span>  
-                                    <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" id="btnCopyResponse">  
-                                        <i class="bi bi-clipboard"></i> Copiar Response  
+                                    <button type="button" class="btn btn-sm btn-utility ms-auto" id="btnCopyResponse">  
+                                        📋 Copiar Response  
                                     </button>  
                                 </div>
             
                                 <!-- Headers da Response -->  
                                 <div class="mb-2">  
-                                    <button class="btn btn-sm btn-outline-info" type="button" data-bs-toggle="collapse"   
+                                    <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="collapse"   
                                             data-bs-target="#responseHeaders" aria-expanded="false">  
-                                        <i class="bi bi-list-ul"></i> Ver Headers da Response  
+                                        📋 Ver Headers da Response  
                                     </button>  
                                     <div class="collapse mt-2" id="responseHeaders">  
                                         <pre class="bg-light p-2 rounded" id="responseHeadersContent" style="max-height: 150px; overflow-y: auto;"></pre>  
@@ -725,8 +725,8 @@
                                 <textarea class="form-control font-monospace" id="curlResponse" rows="12" readonly></textarea>
                                 
                                 <!-- Botão para Formatar JSON -->  
-                                <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="btnFormatarResponse">  
-                                    <i class="bi bi-code"></i> Formatar JSON  
+                                <button type="button" class="btn btn-sm btn-secondary mt-2" id="btnFormatarResponse">  
+                                    ✨ Formatar JSON  
                                 </button>  
                             </div>
             
@@ -750,20 +750,20 @@
                                 <div class="tab-content">  
                                     <div class="tab-pane fade show active" id="fetchCode">  
                                         <textarea class="form-control font-monospace" id="fetchOutput" rows="10" readonly></textarea>  
-                                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="btnCopyFetch">  
-                                            <i class="bi bi-clipboard"></i> Copiar  
+                                        <button type="button" class="btn btn-sm btn-utility mt-2" id="btnCopyFetch">  
+                                            📋 Copiar  
                                         </button>  
                                     </div>  
                                     <div class="tab-pane fade" id="axiosCode">  
                                         <textarea class="form-control font-monospace" id="axiosOutput" rows="10" readonly></textarea>  
-                                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="btnCopyAxios">  
-                                            <i class="bi bi-clipboard"></i> Copiar  
+                                        <button type="button" class="btn btn-sm btn-utility mt-2" id="btnCopyAxios">  
+                                            📋 Copiar  
                                         </button>  
                                     </div>  
                                     <div class="tab-pane fade" id="xhrCode">  
                                         <textarea class="form-control font-monospace" id="xhrOutput" rows="10" readonly></textarea>  
-                                        <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="btnCopyXhr">  
-                                            <i class="bi bi-clipboard"></i> Copiar  
+                                        <button type="button" class="btn btn-sm btn-utility mt-2" id="btnCopyXhr">  
+                                            📋 Copiar  
                                         </button>  
                                     </div>  
                                 </div>  
@@ -821,8 +821,8 @@
             
                                 <!-- Botão Gerar -->  
                                 <div class="col-12">  
-                                    <button type="button" class="btn btn-success" id="btnGerarCurl">  
-                                        <i class="bi bi-lightning-fill"></i> Gerar cURL  
+                                    <button type="button" class="btn btn-secondary" id="btnGerarCurl">  
+                                        ✨ Gerar cURL  
                                     </button>  
                                 </div>
             
@@ -830,8 +830,8 @@
                                 <div class="col-12" id="genCurlOutputArea" style="display: none;">  
                                     <label class="form-label fw-bold">cURL Gerado:</label>  
                                     <textarea class="form-control font-monospace" id="genCurlOutput" rows="8" readonly></textarea>  
-                                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" id="btnCopyGenCurl">  
-                                        <i class="bi bi-clipboard"></i> Copiar cURL  
+                                    <button type="button" class="btn btn-sm btn-utility mt-2" id="btnCopyGenCurl">  
+                                        📋 Copiar cURL  
                                     </button>  
                                 </div>  
                             </div>  

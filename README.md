@@ -58,6 +58,7 @@ Este projeto é baseado no trabalho original de **Isabella Barbosa**. Todas as f
 - [Funcionalidades](#-funcionalidades)
 - [Como Usar](#-como-usar)
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
+- [Sistema de Botões](#-sistema-de-botões)
 - [Instalação e Deploy](#-instalação-e-deploy)
 - [Contribuindo](#-contribuindo)
 - [Licença](#-licença)
@@ -458,6 +459,153 @@ A aba Geradores de Dados foi completamente refatorada para melhorar a organizaç
 - **Bootstrap Dark Theme - BSQA Design System**: Tema escuro customizado
 - **Crypto-JS**: Biblioteca para geração de hash MD5 (via CDN)
 - **Web Crypto API**: API nativa do navegador para SHA-256 e SHA-512
+
+## 🎨 Sistema de Botões
+
+O projeto utiliza um **sistema de design consistente** para botões, criando uma hierarquia visual clara e melhorando a experiência do usuário.
+
+### Hierarquia Visual
+
+O sistema de botões segue uma hierarquia visual bem definida, organizada por função e importância:
+
+| Categoria | Função | Classe CSS | Uso | Exemplo |
+|-----------|--------|------------|-----|---------|
+| **Primário** | Ações principais do fluxo | `btn-primary` | Gerar, Executar, Comparar | ✨ Gerar CPF, 🔍 Comparar |
+| **Secundário** | Ações complementares | `btn-secondary` | Validar, Converter, Formatar | 🔒 Encode, 📦 Compactar |
+| **Utilitário** | Copiar, Limpar, Swap | `btn-utility` | Copiar dados, Limpar campos | 📋 Copiar, 🗑️ Limpar |
+| **Sucesso** | Feedback temporário | `btn-success` | Estado "Copiado!" (automático) | ✓ Copiado! |
+| **Info** | Ações informativas | `btn-info` | Ações secundárias específicas | { } Copiar JSON |
+| **Destrutivo** | Limpeza crítica | `btn-warning` | Limpar dados importantes | 🗑️ Limpar (contextos críticos) |
+
+### Paleta de Cores
+
+#### Botões Primários (`btn-primary`)
+- **Background**: Gradiente suave índigo/roxo (opacidade 0.85)
+- **Borda**: Índigo translúcido (opacidade 0.3)
+- **Sombra**: 12px (reduzida de 45px)
+- **Hover**: Sombra 16px, brilho 1.1x, movimento sutil (-1px)
+- **Uso**: Ações principais que o usuário deve realizar
+
+#### Botões Secundários (`btn-secondary`)
+- **Background**: Cinza escuro sólido (opacidade 0.8)
+- **Borda**: Cinza médio (opacidade 0.5)
+- **Texto**: Cinza claro (#d1d5db)
+- **Hover**: Background sólido, borda índigo
+- **Uso**: Ações complementares, conversões, validações
+
+#### Botões Utilitários (`btn-utility`)
+- **Background**: Transparente
+- **Borda**: Cinza translúcido (opacidade 0.4)
+- **Texto**: Cinza médio (#9ca3af)
+- **Hover**: Background cinza escuro sutil, sem movimento
+- **Uso**: Copiar, limpar, trocar campos
+
+#### Botões de Sucesso (`btn-success`)
+- **Background**: Verde translúcido (opacidade 0.15)
+- **Borda**: Verde (opacidade 0.3)
+- **Texto**: Verde (#10b981)
+- **Uso**: Feedback temporário (ex: "✓ Copiado!")
+
+### Padrões de Ícones
+
+Os botões utilizam emojis como ícones para melhor identificação visual:
+
+| Função | Ícone | Exemplo |
+|--------|-------|---------|
+| Gerar/Criar | ✨ | ✨ Gerar CPF |
+| Copiar | 📋 | 📋 Copiar |
+| Limpar | 🗑️ | 🗑️ Limpar |
+| Executar | ▶️ | ▶️ Executar Request |
+| Validar | ✅ | ✅ Validar Estrutura |
+| Converter | 🔄 | 🔄 Converter |
+| Comparar | 🔍 | 🔍 Comparar |
+| Formatar | ✨ | ✨ Formatar |
+| Encode | 🔒 | 🔒 Encode |
+| Decode | 🔓 | 🔓 Decode |
+| JSON | { } | { } Copiar JSON |
+| Testar | 🔍 | 🔍 Testar Regex |
+
+### Exemplos de Uso
+
+#### Botão Primário (Ação Principal)
+```html
+<button type="button" class="btn btn-primary" id="btnGenerateCpf">
+    ✨ Gerar CPF
+</button>
+```
+
+#### Botão Secundário (Ação Complementar)
+```html
+<button type="button" class="btn btn-secondary" id="btnBase64Encode">
+    🔒 Encode
+</button>
+```
+
+#### Botão Utilitário (Copiar/Limpar)
+```html
+<button type="button" class="btn btn-utility" id="btnCopyCpf" title="Copiar CPF">
+    📋
+</button>
+```
+
+#### Agrupamento de Botões
+```html
+<div class="d-flex gap-2">
+    <button type="button" class="btn btn-primary" id="btnGerar">
+        ✨ Gerar
+    </button>
+    <button type="button" class="btn btn-utility" id="btnCopiar">
+        📋 Copiar
+    </button>
+    <button type="button" class="btn btn-utility" id="btnLimpar">
+        🗑️ Limpar
+    </button>
+</div>
+```
+
+### Feedback Visual
+
+Todos os botões de copiar utilizam feedback visual automático:
+
+```javascript
+// Ao copiar, o botão muda temporariamente para "✓ Copiado!"
+// Após 1.5s, retorna ao estado original preservando classes e ícones
+mostrarFeedbackCopiar(botao);
+```
+
+### Responsividade
+
+- **Desktop**: Botões em linha com espaçamento adequado
+- **Tablet**: Botões se ajustam mantendo hierarquia
+- **Mobile**: Botões empilham verticalmente quando necessário (largura 100%)
+
+### Acessibilidade
+
+- ✅ Contraste mínimo de 4.5:1 (WCAG 2.1 AA)
+- ✅ Foco visível com outline
+- ✅ Navegação por teclado (Tab, Enter, Espaço)
+- ✅ Área de toque adequada em mobile (mínimo 44x44px)
+
+### Variáveis CSS
+
+O sistema utiliza variáveis CSS para fácil customização:
+
+```css
+/* Botões Primários */
+--btn-primary-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.85), rgba(139, 92, 246, 0.85));
+--btn-primary-border: rgba(99, 102, 241, 0.3);
+--btn-primary-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+
+/* Botões Secundários */
+--btn-secondary-bg: rgba(31, 41, 55, 0.8);
+--btn-secondary-border: rgba(75, 85, 99, 0.5);
+
+/* Botões Utilitários */
+--btn-utility-border: rgba(107, 114, 128, 0.4);
+--btn-utility-text: #9ca3af;
+```
+
+Para mais detalhes sobre o design system, consulte o arquivo `bootstrap-dark-theme.css`.
 
 ## 🚀 Instalação e Deploy
 

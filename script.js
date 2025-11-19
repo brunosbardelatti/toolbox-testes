@@ -68,18 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
     btnCopyText.addEventListener('click', function() {
         textInputCase.select();
         document.execCommand('copy');
-        
-        // Feedback visual
-        const textoOriginal = btnCopyText.textContent;
-        btnCopyText.textContent = 'Copiado!';
-        btnCopyText.classList.add('btn-success');
-        btnCopyText.classList.remove('btn-secondary');
-        
-        setTimeout(function() {
-            btnCopyText.textContent = textoOriginal;
-            btnCopyText.classList.remove('btn-success');
-            btnCopyText.classList.add('btn-secondary');
-        }, 1500);
+        mostrarFeedbackCopiar(btnCopyText);
     });
 
     // Limpar texto
@@ -226,18 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
     btnJsonCopy.addEventListener('click', function() {
         jsonInput.select();
         document.execCommand('copy');
-        
-        // Feedback visual
-        const textoOriginal = btnJsonCopy.textContent;
-        btnJsonCopy.textContent = 'Copiado!';
-        btnJsonCopy.classList.add('btn-success');
-        btnJsonCopy.classList.remove('btn-secondary');
-        
-        setTimeout(function() {
-            btnJsonCopy.textContent = textoOriginal;
-            btnJsonCopy.classList.remove('btn-success');
-            btnJsonCopy.classList.add('btn-secondary');
-        }, 1500);
+        mostrarFeedbackCopiar(btnJsonCopy);
     });
 
     // Limpar JSON
@@ -297,18 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (cpfOutput.value) {
             cpfOutput.select();
             document.execCommand('copy');
-            
-            // Feedback visual
-            const textoOriginal = btnCopyCpf.textContent;
-            btnCopyCpf.textContent = 'Copiado!';
-            btnCopyCpf.classList.add('btn-success');
-            btnCopyCpf.classList.remove('btn-outline-secondary');
-            
-            setTimeout(function() {
-                btnCopyCpf.textContent = textoOriginal;
-                btnCopyCpf.classList.remove('btn-success');
-                btnCopyCpf.classList.add('btn-outline-secondary');
-            }, 1500);
+            mostrarFeedbackCopiar(btnCopyCpf);
         }
     });
 
@@ -364,18 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (cnpjOutput.value) {
             cnpjOutput.select();
             document.execCommand('copy');
-            
-            // Feedback visual
-            const textoOriginal = btnCopyCnpj.textContent;
-            btnCopyCnpj.textContent = 'Copiado!';
-            btnCopyCnpj.classList.add('btn-success');
-            btnCopyCnpj.classList.remove('btn-outline-secondary');
-            
-            setTimeout(function() {
-                btnCopyCnpj.textContent = textoOriginal;
-                btnCopyCnpj.classList.remove('btn-success');
-                btnCopyCnpj.classList.add('btn-outline-secondary');
-            }, 1500);
+            mostrarFeedbackCopiar(btnCopyCnpj);
         }
     });
 
@@ -543,14 +499,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Função auxiliar para feedback de copiar
     function mostrarFeedbackCopiar(botao) {
         const textoOriginal = botao.textContent;
-        botao.textContent = 'Copiado!';
-        botao.classList.add('btn-success');
-        botao.classList.remove('btn-outline-secondary');
+        const classesOriginais = Array.from(botao.classList);
+        
+        botao.textContent = '✓ Copiado!';
+        botao.className = 'btn btn-success';
         
         setTimeout(function() {
             botao.textContent = textoOriginal;
-            botao.classList.remove('btn-success');
-            botao.classList.add('btn-outline-secondary');
+            botao.className = classesOriginais.join(' ');
         }, 1500);
     }
 
@@ -993,14 +949,14 @@ document.getElementById('btnCopiarPJJson').addEventListener('click', function() 
   
 function mostrarFeedbackBotao(botao, mensagem) {  
     const textoOriginal = botao.innerHTML;  
-    const classesOriginais = botao.className;
+    const classesOriginais = Array.from(botao.classList);
       
-    botao.innerHTML = mensagem;  
+    botao.innerHTML = '✓ ' + mensagem;  
     botao.className = 'btn btn-success';
       
     setTimeout(function() {  
         botao.innerHTML = textoOriginal;  
-        botao.className = classesOriginais;  
+        botao.className = classesOriginais.join(' ');  
     }, 1500);  
 }  
 
