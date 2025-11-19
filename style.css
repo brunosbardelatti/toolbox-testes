@@ -307,3 +307,195 @@ header p {
     }
 }
 
+/* ============================================
+   ESTILOS PARA ABA VALIDADOR XML FISCAL
+   ============================================ */
+
+/* Textarea de entrada XML - fonte monoespaçada */
+#xmlFiscalInput {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    background-color: var(--ds-bg-elevated-soft);
+    border: 1px solid var(--ds-border-subtle);
+    color: var(--ds-text-primary);
+    transition: border-color var(--ds-transition-fast), box-shadow var(--ds-transition-fast);
+}
+
+#xmlFiscalInput:focus {
+    border-color: var(--ds-accent);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    background-color: var(--ds-bg-elevated-soft);
+    color: var(--ds-text-primary);
+}
+
+#xmlFiscalInput::placeholder {
+    color: var(--ds-text-tertiary);
+    opacity: 0.6;
+}
+
+/* Textarea de dados extraídos (readonly) */
+#xmlDadosExtraidos {
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    background-color: rgba(17, 24, 39, 0.5) !important;
+    border: 1px solid var(--ds-border-subtle);
+    color: var(--ds-text-primary);
+    cursor: default;
+    opacity: 0.9;
+}
+
+/* Input readonly do tipo de documento */
+#xmlTipoDocumento {
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    font-weight: 600;
+    background-color: rgba(17, 24, 39, 0.5) !important;
+    border: 1px solid var(--ds-border-subtle);
+    color: var(--ds-text-primary);
+}
+
+/* Badge de status */
+#xmlStatusBadge {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: transform 0.2s ease;
+}
+
+#xmlStatusBadge.bg-success {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    color: #10b981 !important;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+#xmlStatusBadge.bg-danger {
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    color: #ef4444 !important;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Alertas de erros e avisos */
+#xmlErrosLista ul,
+#xmlAvisosLista ul {
+    margin-bottom: 0;
+    padding-left: 1.5rem;
+}
+
+#xmlErrosLista li,
+#xmlAvisosLista li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+#xmlErrosLista li:last-child,
+#xmlAvisosLista li:last-child {
+    margin-bottom: 0;
+}
+
+/* Alert danger customizado para tema escuro */
+#xmlErrosContainer .alert-danger {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    border-radius: 8px;
+}
+
+/* Alert warning customizado para tema escuro */
+#xmlAvisosContainer .alert-warning {
+    background-color: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    color: #fcd34d;
+    border-radius: 8px;
+}
+
+/* Card de resultado com gradiente */
+#xmlFiscalResultado .card {
+    background: radial-gradient(circle at top left, var(--ds-accent-soft), var(--ds-bg-elevated-soft));
+    border: 1px solid var(--ds-border-subtle);
+    box-shadow: var(--ds-shadow-soft);
+    transition: transform var(--ds-transition-med), box-shadow var(--ds-transition-med);
+    border-radius: 12px;
+}
+
+#xmlFiscalResultado .card-header {
+    border-radius: 12px 12px 0 0 !important;
+    border-bottom: 1px solid var(--ds-border-subtle);
+    background-color: var(--ds-bg-elevated) !important;
+}
+
+/* Labels com cores específicas */
+#aba-xml-fiscal .form-label.fw-bold.text-danger {
+    color: #fca5a5 !important;
+}
+
+#aba-xml-fiscal .form-label.fw-bold.text-warning {
+    color: #fcd34d !important;
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+    #xmlFiscalInput {
+        font-size: 0.85rem;
+    }
+    
+    #xmlDadosExtraidos {
+        font-size: 0.8rem;
+    }
+    
+    #aba-xml-fiscal .d-flex.gap-2 {
+        flex-direction: column;
+    }
+    
+    #aba-xml-fiscal .d-flex.gap-2 .btn {
+        width: 100%;
+    }
+    
+    #xmlFiscalResultado .card-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.5rem;
+    }
+    
+    #xmlStatusBadge {
+        align-self: flex-start;
+    }
+}
+
+/* Melhorias de acessibilidade */
+#xmlFiscalInput:focus-visible,
+#xmlDadosExtraidos:focus-visible {
+    outline: 2px solid var(--ds-accent);
+    outline-offset: 2px;
+}
+
+/* Scroll suave para textareas grandes */
+#xmlFiscalInput,
+#xmlDadosExtraidos {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ds-border-subtle) transparent;
+}
+
+#xmlFiscalInput::-webkit-scrollbar,
+#xmlDadosExtraidos::-webkit-scrollbar {
+    width: 8px;
+}
+
+#xmlFiscalInput::-webkit-scrollbar-track,
+#xmlDadosExtraidos::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#xmlFiscalInput::-webkit-scrollbar-thumb,
+#xmlDadosExtraidos::-webkit-scrollbar-thumb {
+    background-color: var(--ds-border-subtle);
+    border-radius: 4px;
+}
+
+#xmlFiscalInput::-webkit-scrollbar-thumb:hover,
+#xmlDadosExtraidos::-webkit-scrollbar-thumb:hover {
+    background-color: var(--ds-accent);
+}
+

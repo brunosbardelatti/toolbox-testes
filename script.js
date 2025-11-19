@@ -1742,6 +1742,1169 @@ function mostrarFeedbackBotao(botao, mensagem) {
         setTimeout(() => {  
             toast.remove();  
         }, 3000);  
-    }  
+    } 
+    
+    // ============================================    
+    // ABA: VALIDADOR DE XML DOCUMENTOS FISCAIS    
+    // ============================================
+    
+    // ============================================    
+    // FUNÇÕES AUXILIARES - VALIDAÇÃO CPF/CNPJ    
+    // ============================================
+    
+    function validarCPF(cpf) {
+        if (!cpf) return false;
+        
+        // Remove caracteres não numéricos
+        cpf = cpf.replace(/[^\d]/g, '');
+        
+        // Verifica se tem 11 dígitos
+        if (cpf.length !== 11) return false;
+        
+        // Verifica se todos os dígitos são iguais (CPF inválido)
+        if (/^(\d)\1{10}$/.test(cpf)) return false;
+        
+        // Valida primeiro dígito verificador
+        let soma = 0;
+        for (let i = 0; i < 9; i++) {
+            soma += parseInt(cpf.charAt(i)) * (10 - i);
+        }
+        let resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.charAt(9))) return false;
+        
+        // Valida segundo dígito verificador
+        soma = 0;
+        for (let i = 0; i < 10; i++) {
+            soma += parseInt(cpf.charAt(i)) * (11 - i);
+        }
+        resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.charAt(10))) return false;
+        
+        return true;
+    }
+    
+    function validarCNPJ(cnpj) {
+        if (!cnpj) return false;
+        
+        // Remove caracteres não numéricos
+        cnpj = cnpj.replace(/[^\d]/g, '');
+        
+        // Verifica se tem 14 dígitos
+        if (cnpj.length !== 14) return false;
+        
+        // Verifica se todos os dígitos são iguais (CNPJ inválido)
+        if (/^(\d)\1{13}$/.test(cnpj)) return false;
+        
+        // Valida primeiro dígito verificador
+        let tamanho = cnpj.length - 2;
+        let numeros = cnpj.substring(0, tamanho);
+        let digitos = cnpj.substring(tamanho);
+        let soma = 0;
+        let pos = tamanho - 7;
+        
+        for (let i = tamanho; i >= 1; i--) {
+            soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
+            if (pos < 2) pos = 9;
+        }
+        
+        let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+        if (resultado !== parseInt(digitos.charAt(0))) return false;
+        
+        // Valida segundo dígito verificador
+        tamanho = tamanho + 1;
+        numeros = cnpj.substring(0, tamanho);
+        soma = 0;
+        pos = tamanho - 7;
+        
+        for (let i = tamanho; i >= 1; i--) {
+            soma += parseInt(numeros.charAt(tamanho - i)) * pos--;
+            if (pos < 2) pos = 9;
+        }
+        
+        resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+        if (resultado !== parseInt(digitos.charAt(1))) return false;
+        
+        return true;
+    }
+    
+    // ============================================    
+    // IDENTIFICADOR DE TIPO DE DOCUMENTO    
+    // ============================================
+    
+    function identificarTipoDocumento(xmlDoc) {  
+        // NFe - Nota Fiscal Eletrônica  
+        if (xmlDoc.querySelector('nfeProc') || xmlDoc.querySelector('NFe')) {  
+            const mod = xmlDoc.querySelector('ide mod')?.textContent;  
+            return mod === '65' ? 'NFCe' : 'NFe';  
+        }
+        
+        // CT-e - Conhecimento de Transporte Eletrônico  
+        if (xmlDoc.querySelector('cteProc') || xmlDoc.querySelector('CTe')) {  
+            return 'CTe';  
+        }
+        
+        // MDF-e - Manifesto de Documentos Fiscais Eletrônico  
+        if (xmlDoc.querySelector('mdfeProc') || xmlDoc.querySelector('MDFe')) {  
+            return 'MDFe';  
+        }
+        
+        // NFS-e - Nota Fiscal de Serviço Eletrônica  
+        if (xmlDoc.querySelector('CompNfse') || xmlDoc.querySelector('Nfse')) {  
+            return 'NFSe';  
+        }
+        
+        // CF-e SAT - Cupom Fiscal Eletrônico SAT  
+        if (xmlDoc.querySelector('CFe')) {  
+            return 'CFeSAT';  
+        }
+        
+        return 'DESCONHECIDO';  
+    }
+    
+    // ============================================    
+    // VALIDADOR UNIVERSAL DE XML FISCAL    
+    // ============================================
+    
+    function validarXMLFiscal(xmlString) {  
+        try {  
+            const parser = new DOMParser();  
+            const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+            
+            // Verifica erros de parsing  
+            const parserError = xmlDoc.querySelector('parsererror');  
+            if (parserError) {  
+                throw new Error('XML malformado: ' + parserError.textContent);  
+            }
+            
+            const result = {  
+                valido: true,  
+                tipo: null,  
+                erros: [],  
+                avisos: [],  
+                dados: {}  
+            };
+            
+            // Identifica tipo de documento  
+            result.tipo = identificarTipoDocumento(xmlDoc);
+            
+            if (result.tipo === 'DESCONHECIDO') {  
+                result.valido = false;  
+                result.erros.push('Tipo de documento fiscal não identificado');  
+                return result;  
+            }
+            
+            // Redireciona para validador específico  
+            switch (result.tipo) {  
+                case 'NFe':  
+                case 'NFCe':  
+                    return validarNFe(xmlDoc, result);  
+                case 'CTe':  
+                    return validarCTe(xmlDoc, result);  
+                case 'MDFe':  
+                    return validarMDFe(xmlDoc, result);  
+                case 'NFSe':  
+                    return validarNFSe(xmlDoc, result);  
+                case 'CFeSAT':  
+                    return validarCFeSAT(xmlDoc, result);  
+                default:  
+                    result.valido = false;  
+                    result.erros.push('Validador não implementado para este tipo');  
+                    return result;  
+            }
+            
+        } catch (error) {  
+            return {  
+                valido: false,  
+                tipo: null,  
+                erros: ['Erro ao processar XML: ' + error.message],  
+                avisos: [],  
+                dados: {}  
+            };  
+        }  
+    }
+    
+    // ============================================    
+    // VALIDADOR NFe/NFCe (código anterior mantido)  
+    // ============================================
+    
+    function validarNFe(xmlDoc, result) {  
+        const infNFe = xmlDoc.querySelector('infNFe');  
+        if (!infNFe) {  
+            result.valido = false;  
+            result.erros.push('Tag <infNFe> não encontrada');  
+            return result;  
+        }
+        
+        result.dados = extrairDadosNFe(xmlDoc);  
+        validarCamposObrigatoriosNFe(xmlDoc, result);  
+        validarChaveAcesso(xmlDoc, result, 'NFe');  
+        validarEmitente(xmlDoc, result);  
+        validarDestinatario(xmlDoc, result);  
+        validarProdutos(xmlDoc, result);  
+        validarTotais(xmlDoc, result);  
+        validarAssinatura(xmlDoc, result);
+        
+        result.valido = result.erros.length === 0;  
+        return result;  
+    }
+    
+    // ============================================    
+    // EXTRAÇÃO DE DADOS NFe    
+    // ============================================
+    
+    function extrairDadosNFe(xmlDoc) {
+        const dados = {};
+        
+        // Chave de acesso
+        const infNFe = xmlDoc.querySelector('infNFe');
+        dados.chaveAcesso = infNFe?.getAttribute('Id')?.replace('NFe', '');
+        
+        // Dados da IDE
+        const ide = xmlDoc.querySelector('ide');
+        if (ide) {
+            dados.numero = ide.querySelector('nNF')?.textContent;
+            dados.serie = ide.querySelector('serie')?.textContent;
+            dados.dataEmissao = ide.querySelector('dhEmi')?.textContent;
+            dados.dataSaida = ide.querySelector('dhSaiEnt')?.textContent;
+            dados.modelo = ide.querySelector('mod')?.textContent;
+            dados.naturezaOperacao = ide.querySelector('natOp')?.textContent;
+            dados.tipoOperacao = ide.querySelector('tpNF')?.textContent; // 0=Entrada, 1=Saída
+            dados.tipoEmissao = ide.querySelector('tpEmis')?.textContent;
+            dados.ambiente = ide.querySelector('tpAmb')?.textContent; // 1=Produção, 2=Homologação
+            dados.finalidade = ide.querySelector('finNFe')?.textContent;
+            dados.indicadorFinal = ide.querySelector('indFinal')?.textContent; // 0=Não, 1=Sim
+            dados.indicadorPresenca = ide.querySelector('indPres')?.textContent;
+        }
+        
+        // Emitente
+        const emit = xmlDoc.querySelector('emit');
+        if (emit) {
+            dados.emitente = {
+                cnpj: emit.querySelector('CNPJ')?.textContent,
+                razaoSocial: emit.querySelector('xNome')?.textContent,
+                nomeFantasia: emit.querySelector('xFant')?.textContent,
+                ie: emit.querySelector('IE')?.textContent,
+                crt: emit.querySelector('CRT')?.textContent,
+                endereco: extrairEnderecoNFe(emit)
+            };
+        }
+        
+        // Destinatário
+        const dest = xmlDoc.querySelector('dest');
+        if (dest) {
+            dados.destinatario = {
+                cpf: dest.querySelector('CPF')?.textContent,
+                cnpj: dest.querySelector('CNPJ')?.textContent,
+                nome: dest.querySelector('xNome')?.textContent,
+                ie: dest.querySelector('IE')?.textContent,
+                endereco: extrairEnderecoNFe(dest)
+            };
+        }
+        
+        // Produtos
+        const produtos = xmlDoc.querySelectorAll('det');
+        dados.produtos = Array.from(produtos).map((det, index) => {
+            const prod = det.querySelector('prod');
+            const imposto = det.querySelector('imposto');
+            return {
+                item: det.getAttribute('nItem') || (index + 1).toString(),
+                codigo: prod?.querySelector('cProd')?.textContent,
+                ean: prod?.querySelector('cEAN')?.textContent,
+                descricao: prod?.querySelector('xProd')?.textContent,
+                ncm: prod?.querySelector('NCM')?.textContent,
+                cest: prod?.querySelector('CEST')?.textContent,
+                cfop: prod?.querySelector('CFOP')?.textContent,
+                unidade: prod?.querySelector('uCom')?.textContent,
+                quantidade: prod?.querySelector('qCom')?.textContent,
+                valorUnitario: prod?.querySelector('vUnCom')?.textContent,
+                valorTotal: prod?.querySelector('vProd')?.textContent,
+                valorTributos: imposto?.querySelector('vTotTrib')?.textContent
+            };
+        });
+        
+        // Totais
+        const total = xmlDoc.querySelector('total');
+        if (total) {
+            const icmsTot = total.querySelector('ICMSTot');
+            if (icmsTot) {
+                dados.totais = {
+                    valorProdutos: icmsTot.querySelector('vProd')?.textContent,
+                    valorFrete: icmsTot.querySelector('vFrete')?.textContent,
+                    valorSeguro: icmsTot.querySelector('vSeg')?.textContent,
+                    valorDesconto: icmsTot.querySelector('vDesc')?.textContent,
+                    valorII: icmsTot.querySelector('vII')?.textContent,
+                    valorIPI: icmsTot.querySelector('vIPI')?.textContent,
+                    valorPIS: icmsTot.querySelector('vPIS')?.textContent,
+                    valorCOFINS: icmsTot.querySelector('vCOFINS')?.textContent,
+                    valorOutros: icmsTot.querySelector('vOutro')?.textContent,
+                    valorNF: icmsTot.querySelector('vNF')?.textContent,
+                    valorTributos: icmsTot.querySelector('vTotTrib')?.textContent
+                };
+            }
+        }
+        
+        // Transporte
+        const transp = xmlDoc.querySelector('transp');
+        if (transp) {
+            dados.transporte = {
+                modalidadeFrete: transp.querySelector('modFrete')?.textContent,
+                transportadora: null
+            };
+            
+            const transporta = transp.querySelector('transporta');
+            if (transporta) {
+                dados.transporte.transportadora = {
+                    cnpj: transporta.querySelector('CNPJ')?.textContent,
+                    razaoSocial: transporta.querySelector('xNome')?.textContent,
+                    ie: transporta.querySelector('IE')?.textContent,
+                    endereco: transporta.querySelector('xEnder')?.textContent,
+                    municipio: transporta.querySelector('xMun')?.textContent,
+                    uf: transporta.querySelector('UF')?.textContent
+                };
+            }
+        }
+        
+        // Pagamento
+        const pag = xmlDoc.querySelector('pag');
+        if (pag) {
+            const detPag = pag.querySelector('detPag');
+            if (detPag) {
+                dados.pagamento = {
+                    forma: detPag.querySelector('tPag')?.textContent,
+                    valor: detPag.querySelector('vPag')?.textContent
+                };
+            }
+        }
+        
+        // Protocolo de autorização
+        const protNFe = xmlDoc.querySelector('protNFe infProt');
+        if (protNFe) {
+            dados.protocolo = {
+                numero: protNFe.querySelector('nProt')?.textContent,
+                dataAutorizacao: protNFe.querySelector('dhRecbto')?.textContent,
+                status: protNFe.querySelector('cStat')?.textContent,
+                motivo: protNFe.querySelector('xMotivo')?.textContent
+            };
+        }
+        
+        return dados;
+    }
+    
+    function extrairEnderecoNFe(node) {
+        const endereco = node.querySelector('enderEmit, enderDest');
+        if (!endereco) return null;
+        
+        return {
+            logradouro: endereco.querySelector('xLgr')?.textContent,
+            numero: endereco.querySelector('nro')?.textContent,
+            complemento: endereco.querySelector('xCpl')?.textContent,
+            bairro: endereco.querySelector('xBairro')?.textContent,
+            municipio: endereco.querySelector('xMun')?.textContent,
+            uf: endereco.querySelector('UF')?.textContent,
+            cep: endereco.querySelector('CEP')?.textContent,
+            pais: endereco.querySelector('xPais')?.textContent
+        };
+    }
+    
+    // ============================================    
+    // VALIDAÇÕES NFe    
+    // ============================================
+    
+    function validarCamposObrigatoriosNFe(xmlDoc, result) {
+        const camposObrigatorios = [
+            { tag: 'ide', nome: 'Identificação da NFe' },
+            { tag: 'emit', nome: 'Emitente' },
+            { tag: 'dest', nome: 'Destinatário' },
+            { tag: 'total', nome: 'Totais' }
+        ];
+        
+        camposObrigatorios.forEach(campo => {
+            if (!xmlDoc.querySelector(campo.tag)) {
+                result.erros.push(`Campo obrigatório ausente: ${campo.nome} (<${campo.tag}>)`);
+            }
+        });
+    }
+    
+    function validarEmitente(xmlDoc, result) {
+        const emit = xmlDoc.querySelector('emit');
+        if (!emit) return;
+        
+        const cnpj = emit.querySelector('CNPJ')?.textContent;
+        const razaoSocial = emit.querySelector('xNome')?.textContent;
+        const ie = emit.querySelector('IE')?.textContent;
+        
+        if (!cnpj) {
+            result.erros.push('CNPJ do emitente não informado');
+        } else if (!validarCNPJ(cnpj)) {
+            result.erros.push('CNPJ do emitente inválido: ' + cnpj);
+        }
+        
+        if (!razaoSocial || razaoSocial.trim().length < 2) {
+            result.erros.push('Razão social do emitente inválida');
+        }
+        
+        if (!ie) {
+            result.avisos.push('Inscrição estadual do emitente não informada');
+        }
+    }
+    
+    function validarDestinatario(xmlDoc, result) {
+        const dest = xmlDoc.querySelector('dest');
+        if (!dest) {
+            result.erros.push('Destinatário não informado');
+            return;
+        }
+        
+        const cnpj = dest.querySelector('CNPJ')?.textContent;
+        const cpf = dest.querySelector('CPF')?.textContent;
+        const nome = dest.querySelector('xNome')?.textContent;
+        
+        if (!cnpj && !cpf) {
+            result.erros.push('CPF/CNPJ do destinatário não informado');
+        } else if (cnpj && !validarCNPJ(cnpj)) {
+            result.erros.push('CNPJ do destinatário inválido');
+        } else if (cpf && !validarCPF(cpf)) {
+            result.erros.push('CPF do destinatário inválido');
+        }
+        
+        if (!nome) {
+            result.erros.push('Nome do destinatário não informado');
+        }
+    }
+    
+    function validarProdutos(xmlDoc, result) {
+        const produtos = xmlDoc.querySelectorAll('det');
+        
+        if (produtos.length === 0) {
+            result.erros.push('Nenhum produto informado na NFe');
+            return;
+        }
+        
+        produtos.forEach((det, index) => {
+            const prod = det.querySelector('prod');
+            if (!prod) {
+                result.erros.push(`Produto ${index + 1}: tag <prod> não encontrada`);
+                return;
+            }
+            
+            const codigo = prod.querySelector('cProd')?.textContent;
+            const descricao = prod.querySelector('xProd')?.textContent;
+            const ncm = prod.querySelector('NCM')?.textContent;
+            const cfop = prod.querySelector('CFOP')?.textContent;
+            const quantidade = prod.querySelector('qCom')?.textContent;
+            const valorUnitario = prod.querySelector('vUnCom')?.textContent;
+            const valorTotal = prod.querySelector('vProd')?.textContent;
+            
+            if (!codigo) {
+                result.erros.push(`Produto ${index + 1}: código não informado`);
+            }
+            
+            if (!descricao || descricao.trim().length < 2) {
+                result.erros.push(`Produto ${index + 1}: descrição inválida`);
+            }
+            
+            if (!ncm) {
+                result.avisos.push(`Produto ${index + 1}: NCM não informado`);
+            }
+            
+            if (!cfop) {
+                result.erros.push(`Produto ${index + 1}: CFOP não informado`);
+            }
+            
+            if (!quantidade || parseFloat(quantidade) <= 0) {
+                result.erros.push(`Produto ${index + 1}: quantidade inválida`);
+            }
+            
+            if (!valorUnitario || parseFloat(valorUnitario) <= 0) {
+                result.erros.push(`Produto ${index + 1}: valor unitário inválido`);
+            }
+            
+            if (!valorTotal || parseFloat(valorTotal) <= 0) {
+                result.erros.push(`Produto ${index + 1}: valor total inválido`);
+            }
+            
+            // Validar cálculo: quantidade * valor unitário ≈ valor total
+            if (quantidade && valorUnitario && valorTotal) {
+                const calculado = parseFloat(quantidade) * parseFloat(valorUnitario);
+                const informado = parseFloat(valorTotal);
+                const diferenca = Math.abs(calculado - informado);
+                
+                if (diferenca > 0.01) {
+                    result.avisos.push(`Produto ${index + 1}: divergência no cálculo (calculado: ${calculado.toFixed(2)}, informado: ${informado.toFixed(2)})`);
+                }
+            }
+        });
+    }
+    
+    function validarTotais(xmlDoc, result) {
+        const total = xmlDoc.querySelector('total');
+        if (!total) {
+            result.erros.push('Totais não encontrados');
+            return;
+        }
+        
+        const icmsTot = total.querySelector('ICMSTot');
+        if (!icmsTot) {
+            result.erros.push('Total ICMS não encontrado');
+            return;
+        }
+        
+        const valorNF = parseFloat(icmsTot.querySelector('vNF')?.textContent || 0);
+        const valorProdutos = parseFloat(icmsTot.querySelector('vProd')?.textContent || 0);
+        const valorFrete = parseFloat(icmsTot.querySelector('vFrete')?.textContent || 0);
+        const valorSeguro = parseFloat(icmsTot.querySelector('vSeg')?.textContent || 0);
+        const valorDesconto = parseFloat(icmsTot.querySelector('vDesc')?.textContent || 0);
+        const valorOutros = parseFloat(icmsTot.querySelector('vOutro')?.textContent || 0);
+        
+        if (valorNF <= 0) {
+            result.erros.push('Valor total da NF deve ser maior que zero');
+        }
+        
+        if (valorProdutos <= 0) {
+            result.erros.push('Valor total dos produtos deve ser maior que zero');
+        }
+        
+        // Validar cálculo aproximado: produtos + frete + seguro - desconto + outros ≈ valor NF
+        const calculado = valorProdutos + valorFrete + valorSeguro - valorDesconto + valorOutros;
+        const diferenca = Math.abs(calculado - valorNF);
+        
+        if (diferenca > 0.01) {
+            result.avisos.push(`Divergência nos totais (calculado: ${calculado.toFixed(2)}, informado: ${valorNF.toFixed(2)})`);
+        }
+        
+        // Validar soma dos produtos
+        const produtos = xmlDoc.querySelectorAll('det');
+        let somaProdutos = 0;
+        produtos.forEach(det => {
+            const valorProd = parseFloat(det.querySelector('prod vProd')?.textContent || 0);
+            somaProdutos += valorProd;
+        });
+        
+        if (produtos.length > 0 && Math.abs(somaProdutos - valorProdutos) > 0.01) {
+            result.avisos.push(`Divergência na soma dos produtos (soma: ${somaProdutos.toFixed(2)}, total: ${valorProdutos.toFixed(2)})`);
+        }
+    }
+    
+    function validarAssinatura(xmlDoc, result) {
+        const signature = xmlDoc.querySelector('Signature');
+        if (!signature) {
+            result.avisos.push('Assinatura digital não encontrada');
+            return;
+        }
+        
+        const signatureValue = signature.querySelector('SignatureValue');
+        if (!signatureValue || !signatureValue.textContent) {
+            result.erros.push('Valor da assinatura digital não encontrado');
+        }
+    }
+    
+    // ============================================    
+    // CÁLCULO DE DÍGITO VERIFICADOR DA CHAVE NFe    
+    // ============================================
+    
+    function calcularDVChaveNFe(chave) {
+        if (chave.length !== 43) {
+            return null;
+        }
+        
+        let soma = 0;
+        let peso = 2;
+        
+        // Percorre a chave de trás para frente
+        for (let i = chave.length - 1; i >= 0; i--) {
+            soma += parseInt(chave[i]) * peso;
+            peso++;
+            if (peso > 9) {
+                peso = 2;
+            }
+        }
+        
+        const resto = soma % 11;
+        const dv = resto < 2 ? 0 : 11 - resto;
+        
+        return dv;
+    }
+    
+    // ============================================    
+    // VALIDADOR CT-e    
+    // ============================================
+    
+    function validarCTe(xmlDoc, result) {  
+        const infCte = xmlDoc.querySelector('infCte');  
+        if (!infCte) {  
+            result.valido = false;  
+            result.erros.push('Tag <infCte> não encontrada');  
+            return result;  
+        }
+        
+        result.dados = extrairDadosCTe(xmlDoc);  
+        validarCamposObrigatoriosCTe(xmlDoc, result);  
+        validarChaveAcesso(xmlDoc, result, 'CTe');  
+        validarEmitenteTransporte(xmlDoc, result);  
+        validarRemetenteDestinatarioCTe(xmlDoc, result);  
+        validarCargaCTe(xmlDoc, result);  
+        validarValoresCTe(xmlDoc, result);  
+        validarAssinatura(xmlDoc, result);
+        
+        result.valido = result.erros.length === 0;  
+        return result;  
+    }
+    
+    function extrairDadosCTe(xmlDoc) {  
+        const dados = {};
+        
+        // Chave de acesso  
+        const infCte = xmlDoc.querySelector('infCte');  
+        dados.chaveAcesso = infCte?.getAttribute('Id')?.replace('CTe', '');
+        
+        // Dados da IDE  
+        const ide = xmlDoc.querySelector('ide');  
+        if (ide) {  
+            dados.numero = ide.querySelector('nCT')?.textContent;  
+            dados.serie = ide.querySelector('serie')?.textContent;  
+            dados.dataEmissao = ide.querySelector('dhEmi')?.textContent;  
+            dados.modelo = ide.querySelector('mod')?.textContent;  
+            dados.tipo = ide.querySelector('tpCTe')?.textContent; // 0=Normal, 1=Complementar, 2=Anulação, 3=Substituto  
+            dados.tipoServico = ide.querySelector('tpServ')?.textContent; // 0=Normal, 1=Subcontratação, etc  
+            dados.naturezaOperacao = ide.querySelector('natOp')?.textContent;  
+        }
+        
+        // Emitente (Transportadora)  
+        const emit = xmlDoc.querySelector('emit');  
+        if (emit) {  
+            dados.emitente = {  
+                cnpj: emit.querySelector('CNPJ')?.textContent,  
+                razaoSocial: emit.querySelector('xNome')?.textContent,  
+                nomeFantasia: emit.querySelector('xFant')?.textContent,  
+                ie: emit.querySelector('IE')?.textContent  
+            };  
+        }
+        
+        // Remetente  
+        const rem = xmlDoc.querySelector('rem');  
+        if (rem) {  
+            dados.remetente = {  
+                cpfCnpj: rem.querySelector('CNPJ')?.textContent || rem.querySelector('CPF')?.textContent,  
+                nome: rem.querySelector('xNome')?.textContent,  
+                ie: rem.querySelector('IE')?.textContent,  
+                endereco: extrairEndereco(rem)  
+            };  
+        }
+        
+        // Destinatário  
+        const dest = xmlDoc.querySelector('dest');  
+        if (dest) {  
+            dados.destinatario = {  
+                cpfCnpj: dest.querySelector('CNPJ')?.textContent || dest.querySelector('CPF')?.textContent,  
+                nome: dest.querySelector('xNome')?.textContent,  
+                ie: dest.querySelector('IE')?.textContent,  
+                endereco: extrairEndereco(dest)  
+            };  
+        }
+        
+        // Expedidor  
+        const exped = xmlDoc.querySelector('exped');  
+        if (exped) {  
+            dados.expedidor = {  
+                cpfCnpj: exped.querySelector('CNPJ')?.textContent || exped.querySelector('CPF')?.textContent,  
+                nome: exped.querySelector('xNome')?.textContent  
+            };  
+        }
+        
+        // Recebedor  
+        const receb = xmlDoc.querySelector('receb');  
+        if (receb) {  
+            dados.recebedor = {  
+                cpfCnpj: receb.querySelector('CNPJ')?.textContent || receb.querySelector('CPF')?.textContent,  
+                nome: receb.querySelector('xNome')?.textContent  
+            };  
+        }
+        
+        // Informações da Carga  
+        const infCarga = xmlDoc.querySelector('infCarga');  
+        if (infCarga) {  
+            dados.carga = {  
+                valorTotal: infCarga.querySelector('vCarga')?.textContent,  
+                produto: infCarga.querySelector('proPred')?.textContent,  
+                outrasCaracteristicas: infCarga.querySelector('xOutCat')?.textContent  
+            };
+            
+            // Quantidades de carga  
+            const infQ = infCarga.querySelectorAll('infQ');  
+            dados.carga.quantidades = Array.from(infQ).map(q => ({  
+                unidade: q.querySelector('cUnid')?.textContent,  
+                tipo: q.querySelector('tpMed')?.textContent,  
+                quantidade: q.querySelector('qCarga')?.textContent  
+            }));  
+        }
+        
+        // Valores do CT-e  
+        const vPrest = xmlDoc.querySelector('vPrest');  
+        if (vPrest) {  
+            dados.valores = {  
+                valorTotal: vPrest.querySelector('vTPrest')?.textContent,  
+                valorReceber: vPrest.querySelector('vRec')?.textContent  
+            };
+            
+            // Componentes do valor  
+            const comp = vPrest.querySelectorAll('Comp');  
+            dados.valores.componentes = Array.from(comp).map(c => ({  
+                nome: c.querySelector('xNome')?.textContent,  
+                valor: c.querySelector('vComp')?.textContent  
+            }));  
+        }
+        
+        // Impostos  
+        const imp = xmlDoc.querySelector('imp');  
+        if (imp) {  
+            dados.impostos = {  
+                icms: imp.querySelector('vTotTrib')?.textContent,  
+                icmsBase: imp.querySelector('vBC')?.textContent,  
+                icmsValor: imp.querySelector('vICMS')?.textContent  
+            };  
+        }
+        
+        // Documentos relacionados (NF-e vinculadas)  
+        const infNFe = xmlDoc.querySelectorAll('infNFe');  
+        dados.documentosVinculados = Array.from(infNFe).map(nf => ({  
+            chave: nf.querySelector('chave')?.textContent  
+        }));
+        
+        // Modal (tipo de transporte)  
+        const modal = xmlDoc.querySelector('modal')?.textContent;  
+        dados.modal = modal; // 01=Rodoviário, 02=Aéreo, 03=Aquaviário, etc
+        
+        // Informações do modal rodoviário  
+        if (modal === '01') {  
+            const rodo = xmlDoc.querySelector('rodo');  
+            if (rodo) {  
+                dados.rodoviario = {  
+                    rntrc: rodo.querySelector('RNTRC')?.textContent  
+                };  
+            }  
+        }
+        
+        // Protocolo de autorização  
+        const protCTe = xmlDoc.querySelector('protCTe infProt');  
+        if (protCTe) {  
+            dados.protocolo = {  
+                numero: protCTe.querySelector('nProt')?.textContent,  
+                dataAutorizacao: protCTe.querySelector('dhRecbto')?.textContent,  
+                status: protCTe.querySelector('cStat')?.textContent,  
+                motivo: protCTe.querySelector('xMotivo')?.textContent  
+            };  
+        }
+        
+        return dados;  
+    }
+    
+    function validarCamposObrigatoriosCTe(xmlDoc, result) {  
+        const camposObrigatorios = [  
+            { tag: 'ide', nome: 'Identificação do CT-e' },  
+            { tag: 'emit', nome: 'Emitente (Transportadora)' },  
+            { tag: 'rem', nome: 'Remetente' },  
+            { tag: 'dest', nome: 'Destinatário' },  
+            { tag: 'vPrest', nome: 'Valores da Prestação' },  
+            { tag: 'imp', nome: 'Impostos' },  
+            { tag: 'infCarga', nome: 'Informações da Carga' }  
+        ];
+        
+        camposObrigatorios.forEach(campo => {  
+            if (!xmlDoc.querySelector(campo.tag)) {  
+                result.erros.push(`Campo obrigatório ausente: ${campo.nome} (<${campo.tag}>)`);  
+            }  
+        });  
+    }
+    
+    function validarEmitenteTransporte(xmlDoc, result) {  
+        const emit = xmlDoc.querySelector('emit');  
+        if (!emit) return;
+        
+        const cnpj = emit.querySelector('CNPJ')?.textContent;  
+        const razaoSocial = emit.querySelector('xNome')?.textContent;  
+        const ie = emit.querySelector('IE')?.textContent;
+        
+        if (!cnpj) {  
+            result.erros.push('CNPJ do emitente (transportadora) não informado');  
+        } else if (!validarCNPJ(cnpj)) {  
+            result.erros.push('CNPJ do emitente inválido: ' + cnpj);  
+        }
+        
+        if (!razaoSocial || razaoSocial.trim().length < 2) {  
+            result.erros.push('Razão social do emitente inválida');  
+        }
+        
+        if (!ie) {  
+            result.avisos.push('Inscrição estadual do emitente não informada');  
+        }  
+    }
+    
+    function validarRemetenteDestinatarioCTe(xmlDoc, result) {  
+        // Valida Remetente  
+        const rem = xmlDoc.querySelector('rem');  
+        if (!rem) {  
+            result.erros.push('Remetente não informado');  
+        } else {  
+            const cnpj = rem.querySelector('CNPJ')?.textContent;  
+            const cpf = rem.querySelector('CPF')?.textContent;  
+            const nome = rem.querySelector('xNome')?.textContent;
+            
+            if (!cnpj && !cpf) {  
+                result.erros.push('CPF/CNPJ do remetente não informado');  
+            } else if (cnpj && !validarCNPJ(cnpj)) {  
+                result.erros.push('CNPJ do remetente inválido');  
+            } else if (cpf && !validarCPF(cpf)) {  
+                result.erros.push('CPF do remetente inválido');  
+            }
+            
+            if (!nome) {  
+                result.erros.push('Nome do remetente não informado');  
+            }  
+        }
+        
+        // Valida Destinatário  
+        const dest = xmlDoc.querySelector('dest');  
+        if (!dest) {  
+            result.erros.push('Destinatário não informado');  
+        } else {  
+            const cnpj = dest.querySelector('CNPJ')?.textContent;  
+            const cpf = dest.querySelector('CPF')?.textContent;  
+            const nome = dest.querySelector('xNome')?.textContent;
+            
+            if (!cnpj && !cpf) {  
+                result.erros.push('CPF/CNPJ do destinatário não informado');  
+            } else if (cnpj && !validarCNPJ(cnpj)) {  
+                result.erros.push('CNPJ do destinatário inválido');  
+            } else if (cpf && !validarCPF(cpf)) {  
+                result.erros.push('CPF do destinatário inválido');  
+            }
+            
+            if (!nome) {  
+                result.erros.push('Nome do destinatário não informado');  
+            }  
+        }  
+    }
+    
+    function validarCargaCTe(xmlDoc, result) {  
+        const infCarga = xmlDoc.querySelector('infCarga');
+        
+        if (!infCarga) {  
+            result.erros.push('Informações da carga não encontradas');  
+            return;  
+        }
+        
+        const vCarga = infCarga.querySelector('vCarga')?.textContent;  
+        const proPred = infCarga.querySelector('proPred')?.textContent;
+        
+        if (!vCarga || parseFloat(vCarga) < 0) {  
+            result.erros.push('Valor da carga inválido');  
+        }
+        
+        if (!proPred) {  
+            result.avisos.push('Produto predominante não informado');  
+        }
+        
+        // Valida quantidades  
+        const infQ = infCarga.querySelectorAll('infQ');  
+        if (infQ.length === 0) {  
+            result.avisos.push('Nenhuma quantidade de carga informada');  
+        }  
+    }
+    
+    function validarValoresCTe(xmlDoc, result) {  
+        const vPrest = xmlDoc.querySelector('vPrest');
+        
+        if (!vPrest) {  
+            result.erros.push('Valores da prestação não encontrados');  
+            return;  
+        }
+        
+        const vTPrest = parseFloat(vPrest.querySelector('vTPrest')?.textContent || 0);  
+        const vRec = parseFloat(vPrest.querySelector('vRec')?.textContent || 0);
+        
+        if (vTPrest <= 0) {  
+            result.erros.push('Valor total da prestação deve ser maior que zero');  
+        }
+        
+        if (vRec <= 0) {  
+            result.avisos.push('Valor a receber não informado ou zerado');  
+        }
+        
+        // Valida soma dos componentes  
+        const comp = vPrest.querySelectorAll('Comp');  
+        let somaComponentes = 0;  
+        comp.forEach(c => {  
+            somaComponentes += parseFloat(c.querySelector('vComp')?.textContent || 0);  
+        });
+        
+        if (comp.length > 0 && Math.abs(somaComponentes - vTPrest) > 0.02) {  
+            result.avisos.push(`Divergência nos componentes de valor (soma: ${somaComponentes.toFixed(2)}, total: ${vTPrest.toFixed(2)})`);  
+        }  
+    }
+    
+    // ============================================    
+    // VALIDADOR MDF-e (Manifesto)    
+    // ============================================
+    
+    function validarMDFe(xmlDoc, result) {  
+        const infMDFe = xmlDoc.querySelector('infMDFe');  
+        if (!infMDFe) {  
+            result.valido = false;  
+            result.erros.push('Tag <infMDFe> não encontrada');  
+            return result;  
+        }
+        
+        result.dados = extrairDadosMDFe(xmlDoc);  
+        validarChaveAcesso(xmlDoc, result, 'MDFe');  
+        result.avisos.push('Validação completa de MDF-e em desenvolvimento');
+        
+        result.valido = result.erros.length === 0;  
+        return result;  
+    }
+    
+    function extrairDadosMDFe(xmlDoc) {  
+        const dados = {};  
+        const infMDFe = xmlDoc.querySelector('infMDFe');  
+        dados.chaveAcesso = infMDFe?.getAttribute('Id')?.replace('MDFe', '');
+        
+        const ide = xmlDoc.querySelector('ide');  
+        if (ide) {  
+            dados.numero = ide.querySelector('nMDF')?.textContent;  
+            dados.serie = ide.querySelector('serie')?.textContent;  
+            dados.dataEmissao = ide.querySelector('dhEmi')?.textContent;  
+        }
+        
+        return dados;  
+    }
+    
+    // ============================================    
+    // VALIDADOR NFS-e    
+    // ============================================
+    
+    function validarNFSe(xmlDoc, result) {  
+        result.dados = { tipo: 'NFSe' };  
+        result.avisos.push('Validação de NFS-e em desenvolvimento (padrões variam por município)');  
+        result.valido = result.erros.length === 0;  
+        return result;  
+    }
+    
+    // ============================================    
+    // VALIDADOR CF-e SAT    
+    // ============================================
+    
+    function validarCFeSAT(xmlDoc, result) {  
+        result.dados = { tipo: 'CFeSAT' };  
+        result.avisos.push('Validação de CF-e SAT em desenvolvimento');  
+        result.valido = result.erros.length === 0;  
+        return result;  
+    }
+    
+    // ============================================    
+    // VALIDAÇÃO DE CHAVE DE ACESSO (Universal)    
+    // ============================================
+    
+    function validarChaveAcesso(xmlDoc, result, tipoDoc) {  
+        const tagMap = {  
+            'NFe': 'infNFe',  
+            'CTe': 'infCte',  
+            'MDFe': 'infMDFe'  
+        };
+        
+        const tag = xmlDoc.querySelector(tagMap[tipoDoc]);  
+        const chaveId = tag?.getAttribute('Id')?.replace(tipoDoc, '');
+        
+        if (!chaveId) {  
+            result.erros.push('Chave de acesso não encontrada no atributo Id');  
+            return;  
+        }
+        
+        if (chaveId.length !== 44) {  
+            result.erros.push(`Chave de acesso inválida: deve ter 44 dígitos (encontrado: ${chaveId.length})`);  
+        }
+        
+        if (!/^\d+$/.test(chaveId)) {  
+            result.erros.push('Chave de acesso deve conter apenas números');  
+        }
+        
+        if (chaveId.length === 44) {  
+            const dvInformado = parseInt(chaveId.charAt(43));  
+            const dvCalculado = calcularDVChaveNFe(chaveId.substring(0, 43));
+            
+            if (dvInformado !== dvCalculado) {  
+                result.erros.push(`Dígito verificador da chave inválido (informado: ${dvInformado}, esperado: ${dvCalculado})`);  
+            }  
+        }  
+    }
+    
+    // ============================================    
+    // FUNÇÕES AUXILIARES    
+    // ============================================
+    
+    function extrairEndereco(node) {  
+        const endereco = node.querySelector('enderEmit, enderDest, enderReme, enderDest');  
+        if (!endereco) return null;
+        
+        return {  
+            logradouro: endereco.querySelector('xLgr')?.textContent,  
+            numero: endereco.querySelector('nro')?.textContent,  
+            bairro: endereco.querySelector('xBairro')?.textContent,  
+            municipio: endereco.querySelector('xMun')?.textContent,  
+            uf: endereco.querySelector('UF')?.textContent,  
+            cep: endereco.querySelector('CEP')?.textContent  
+        };  
+    }
+    
+    // ============================================    
+    // ABA: VALIDADOR XML FISCAL - EVENT LISTENERS    
+    // ============================================
+    
+    // Elementos da aba XML Fiscal
+    const xmlFiscalInput = document.getElementById('xmlFiscalInput');
+    const btnValidarXML = document.getElementById('btnValidarXML');
+    const btnLimparXML = document.getElementById('btnLimparXML');
+    const btnCopiarXMLJson = document.getElementById('btnCopiarXMLJson');
+    const xmlFiscalResultado = document.getElementById('xmlFiscalResultado');
+    
+    // Função para processar e exibir resultado da validação
+    function processarResultadoXML(resultado) {
+        // Mostrar container de resultado
+        xmlFiscalResultado.classList.remove('d-none');
+        
+        // Scroll suave até o resultado
+        xmlFiscalResultado.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        
+        // Atualizar badge de status
+        const badge = document.getElementById('xmlStatusBadge');
+        if (resultado.valido) {
+            badge.className = 'badge bg-success';
+            badge.textContent = '✓ Válido';
+        } else {
+            badge.className = 'badge bg-danger';
+            badge.textContent = '✗ Inválido';
+        }
+        
+        // Tipo de documento
+        const tipoDocumento = document.getElementById('xmlTipoDocumento');
+        tipoDocumento.value = resultado.tipo || 'Não identificado';
+        
+        // Erros
+        const errosContainer = document.getElementById('xmlErrosContainer');
+        const errosLista = document.getElementById('xmlErrosLista');
+        if (resultado.erros && resultado.erros.length > 0) {
+            errosContainer.classList.remove('d-none');
+            errosLista.innerHTML = '<ul class="mb-0">' + 
+                resultado.erros.map(erro => `<li>${escapeHtml(erro)}</li>`).join('') + 
+                '</ul>';
+        } else {
+            errosContainer.classList.add('d-none');
+            errosLista.innerHTML = '';
+        }
+        
+        // Avisos
+        const avisosContainer = document.getElementById('xmlAvisosContainer');
+        const avisosLista = document.getElementById('xmlAvisosLista');
+        if (resultado.avisos && resultado.avisos.length > 0) {
+            avisosContainer.classList.remove('d-none');
+            avisosLista.innerHTML = '<ul class="mb-0">' + 
+                resultado.avisos.map(aviso => `<li>${escapeHtml(aviso)}</li>`).join('') + 
+                '</ul>';
+        } else {
+            avisosContainer.classList.add('d-none');
+            avisosLista.innerHTML = '';
+        }
+        
+        // Dados extraídos (JSON formatado)
+        const dadosJson = JSON.stringify(resultado.dados, null, 2);
+        document.getElementById('xmlDadosExtraidos').value = dadosJson;
+    }
+    
+    // Função auxiliar para escapar HTML (prevenir XSS)
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Event listener: Validar XML
+    if (btnValidarXML) {
+        btnValidarXML.addEventListener('click', function() {
+            const xmlString = xmlFiscalInput.value.trim();
+            
+            // Validação básica
+            if (!xmlString) {
+                alert('Por favor, cole o XML do documento fiscal no campo de entrada.');
+                xmlFiscalInput.focus();
+                return;
+            }
+            
+            // Verificar se parece ser XML
+            if (!xmlString.startsWith('<?xml') && !xmlString.startsWith('<')) {
+                if (!confirm('O texto não parece ser um XML válido. Deseja continuar mesmo assim?')) {
+                    return;
+                }
+            }
+            
+            try {
+                // Chamar função de validação
+                const resultado = validarXMLFiscal(xmlString);
+                
+                // Processar e exibir resultado
+                processarResultadoXML(resultado);
+                
+                // Feedback visual no botão
+                mostrarFeedbackBotao(btnValidarXML, '✅ Validado!');
+                
+            } catch (error) {
+                // Erro inesperado
+                alert('Erro ao processar XML: ' + error.message);
+                console.error('Erro na validação XML:', error);
+            }
+        });
+    }
+    
+    // Event listener: Limpar XML
+    if (btnLimparXML) {
+        btnLimparXML.addEventListener('click', function() {
+            // Limpar textarea de entrada
+            xmlFiscalInput.value = '';
+            
+            // Ocultar resultado
+            xmlFiscalResultado.classList.add('d-none');
+            
+            // Resetar campos de resultado
+            document.getElementById('xmlTipoDocumento').value = '';
+            document.getElementById('xmlStatusBadge').textContent = '';
+            document.getElementById('xmlStatusBadge').className = 'badge';
+            document.getElementById('xmlErrosLista').innerHTML = '';
+            document.getElementById('xmlAvisosLista').innerHTML = '';
+            document.getElementById('xmlDadosExtraidos').value = '';
+            
+            // Focar no campo de entrada
+            xmlFiscalInput.focus();
+        });
+    }
+    
+    // Event listener: Copiar JSON
+    if (btnCopiarXMLJson) {
+        btnCopiarXMLJson.addEventListener('click', function() {
+            const dadosExtraidos = document.getElementById('xmlDadosExtraidos');
+            const jsonText = dadosExtraidos.value.trim();
+            
+            if (!jsonText) {
+                alert('Não há dados para copiar. Valide um XML primeiro.');
+                return;
+            }
+            
+            // Copiar para clipboard
+            navigator.clipboard.writeText(jsonText).then(function() {
+                mostrarFeedbackCopiar(btnCopiarXMLJson);
+            }).catch(function(err) {
+                console.error('Erro ao copiar:', err);
+                alert('Erro ao copiar. Tente selecionar e copiar manualmente.');
+            });
+        });
+    }
 });
 
