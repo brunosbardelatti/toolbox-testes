@@ -51,12 +51,15 @@
             <li class="nav-item" role="presentation">  
                 <button class="nav-link" id="aba-jwt-hash-tab" data-bs-toggle="tab" data-bs-target="#aba-jwt-hash" type="button" role="tab" aria-controls="aba-jwt-hash" aria-selected="false">JWT & Hash</button>  
             </li>  
-            <li class="nav-item" role="presentation">  
-                <button class="nav-link" id="aba-regex-tab" data-bs-toggle="tab" data-bs-target="#aba-regex" type="button" role="tab" aria-controls="aba-regex" aria-selected="false">Regex</button>  
-            </li>  
-            <li class="nav-item" role="presentation">  
-                <button class="nav-link" id="aba-curl-tab" data-bs-toggle="tab" data-bs-target="#aba-curl" type="button" role="tab" aria-controls="aba-curl" aria-selected="false">cURL Tools</button>  
-            </li>  
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="aba-regex-tab" data-bs-toggle="tab" data-bs-target="#aba-regex" type="button" role="tab" aria-controls="aba-regex" aria-selected="false">Regex</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="aba-xml-fiscal-tab" data-bs-toggle="tab" data-bs-target="#aba-xml-fiscal" type="button" role="tab" aria-controls="aba-xml-fiscal" aria-selected="false">Validador XML Fiscal</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="aba-curl-tab" data-bs-toggle="tab" data-bs-target="#aba-curl" type="button" role="tab" aria-controls="aba-curl" aria-selected="false">cURL Tools</button>
+            </li>
         </ul>
 
         <!-- Conteúdo das Abas -->
@@ -640,6 +643,90 @@
                 </div>
                 <button type="button" class="btn btn-primary mb-3" id="btnTestarRegex">🔍 Testar Regex</button>
                 <div id="regexResultado"></div>
+            </div>
+
+            <!-- Aba: Validador XML Fiscal -->
+            <div class="tab-pane fade" id="aba-xml-fiscal" role="tabpanel" aria-labelledby="aba-xml-fiscal-tab">
+                <h3 class="mb-4">Validador de XML Fiscal</h3>
+                
+                <!-- Card: Entrada XML -->
+                <div class="card mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">📄 XML Fiscal</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="xmlFiscalInput" class="form-label fw-bold">Cole o XML do documento fiscal:</label>
+                            <textarea 
+                                class="form-control" 
+                                id="xmlFiscalInput" 
+                                rows="12" 
+                                placeholder='<?xml version="1.0" encoding="UTF-8"?>
+<nfeProc>
+    <NFe>
+        <!-- Conteúdo do XML -->
+    </NFe>
+</nfeProc>'></textarea>
+                            <small class="form-text text-muted">
+                                Suporta: NFe, NFCe, CT-e, MDF-e, NFS-e, CF-e SAT
+                            </small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-primary" id="btnValidarXML">
+                                ✅ Validar XML
+                            </button>
+                            <button type="button" class="btn btn-utility" id="btnLimparXML">
+                                🗑️ Limpar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Resultado da Validação -->
+                <div id="xmlFiscalResultado" class="d-none">
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">📊 Resultado da Validação</h5>
+                            <span class="badge" id="xmlStatusBadge"></span>
+                        </div>
+                        <div class="card-body">
+                            <!-- Tipo de Documento -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tipo de Documento:</label>
+                                <input type="text" class="form-control" id="xmlTipoDocumento" readonly>
+                            </div>
+
+                            <!-- Erros -->
+                            <div id="xmlErrosContainer" class="d-none mb-3">
+                                <label class="form-label fw-bold text-danger">❌ Erros Encontrados:</label>
+                                <div class="alert alert-danger" id="xmlErrosLista" role="alert"></div>
+                            </div>
+
+                            <!-- Avisos -->
+                            <div id="xmlAvisosContainer" class="d-none mb-3">
+                                <label class="form-label fw-bold text-warning">⚠️ Avisos:</label>
+                                <div class="alert alert-warning" id="xmlAvisosLista" role="alert"></div>
+                            </div>
+
+                            <!-- Dados Extraídos -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">📦 Dados Extraídos:</label>
+                                <textarea 
+                                    class="form-control" 
+                                    id="xmlDadosExtraidos" 
+                                    rows="15" 
+                                    readonly></textarea>
+                            </div>
+
+                            <!-- Botão Copiar JSON -->
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-secondary" id="btnCopiarXMLJson">
+                                    { } Copiar JSON
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Aba: cURL Tools -->  
