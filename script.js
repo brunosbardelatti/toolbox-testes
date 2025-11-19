@@ -3176,5 +3176,493 @@ function mostrarFeedbackBotao(botao, mensagem) {
             });
         });
     }
+    
+    // ============================================    
+    // ABA: CONTADOR DE TEMPO PARA DEMANDAS    
+    // ============================================
+    
+    let tarefas = []; // Array para armazenar todas as tarefas
+    let intervalosAtualizacao = {}; // Objeto para armazenar intervalos de atualização
+    const STORAGE_KEY = 'qa-toolbox-tarefas'; // Chave para localStorage
+    
+    // Função para salvar tarefas no localStorage
+    function salvarTarefas() {
+        try {
+            // Atualiza tempo decorrido de tarefas rodando antes de salvar
+            const agora = Date.now();
+            tarefas.forEach(tarefa => {
+                if (tarefa.estado === 'rodando' && tarefa.ultimoStart) {
+                    const tempoDecorrido = Math.floor((agora - tarefa.ultimoStart) / 1000);
+                    tarefa.tempoDecorrido = (tarefa.tempoDecorrido || 0) + tempoDecorrido;
+                    tarefa.ultimoStart = agora; // Atualiza para o momento atual
+                }
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(tarefas));
+        } catch (error) {
+            console.error('Erro ao salvar tarefas no localStorage:', error);
+        }
+    }
+    
+    // Função para carregar tarefas do localStorage
+    function carregarTarefas() {
+        try {
+            const dadosSalvos = localStorage.getItem(STORAGE_KEY);
+            if (dadosSalvos) {
+                const tarefasCarregadas = JSON.parse(dadosSalvos);
+                const agora = Date.now();
+                
+                tarefas = tarefasCarregadas.map(tarefa => {
+                    if (tarefa.estado === 'rodando' && tarefa.ultimoStart) {
+                        // Calcula tempo decorrido desde o último start até agora
+                        const tempoDecorridoDesdeStart = Math.floor((agora - tarefa.ultimoStart) / 1000);
+                        
+                        // Adiciona ao tempo decorrido total
+                        tarefa.tempoDecorrido = (tarefa.tempoDecorrido || 0) + tempoDecorridoDesdeStart;
+                        
+                        // Atualiza último start para agora (reinicia contador)
+                        tarefa.ultimoStart = agora;
+                    }
+                    
+                    return tarefa;
+                });
+                
+                return true;
+            }
+        } catch (error) {
+            console.error('Erro ao carregar tarefas do localStorage:', error);
+        }
+        return false;
+    }
+    
+    // Função para formatar tempo (segundos para HH:MM:SS)
+    function formatarTempo(segundos) {
+        const horas = Math.floor(segundos / 3600);
+        const minutos = Math.floor((segundos % 3600) / 60);
+        const segs = segundos % 60;
+        return `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segs).padStart(2, '0')}`;
+    }
+    
+    // Função para calcular tempo total (incluindo pausas)
+    function calcularTempoTotal(tarefa) {
+        let tempoTotal = tarefa.tempoDecorrido || 0;
+        
+        // Adiciona tempo desde o último start (se estiver rodando)
+        if (tarefa.estado === 'rodando' && tarefa.ultimoStart) {
+            const agora = Date.now();
+            tempoTotal += Math.floor((agora - tarefa.ultimoStart) / 1000);
+        }
+        
+        return tempoTotal;
+    }
+    
+    // Função para atualizar display do timer
+    function atualizarTimer(tarefaId) {
+        const tarefa = tarefas.find(t => t.id === tarefaId);
+        if (!tarefa) return;
+        
+        const tempoTotal = calcularTempoTotal(tarefa);
+        const elemento = document.getElementById(`timer-${tarefaId}`);
+        if (elemento) {
+            elemento.textContent = formatarTempo(tempoTotal);
+        }
+    }
+    
+    // Função para criar HTML de uma tarefa
+    function criarHTMLTarefa(tarefa) {
+        const tempoTotal = calcularTempoTotal(tarefa);
+        const estadoBadge = {
+            'rodando': '<span class="badge bg-success">▶️ Rodando</span>',
+            'pausado': '<span class="badge bg-warning">⏸️ Pausado</span>',
+            'finalizado': '<span class="badge bg-secondary">⏹️ Finalizado</span>'
+        };
+        
+        let pausasHTML = '';
+        if (tarefa.pausas && tarefa.pausas.length > 0) {
+            pausasHTML = '<div class="mt-2"><small class="text-muted fw-bold">Histórico de Pausas:</small><ul class="list-unstyled small mt-1">';
+            tarefa.pausas.forEach((pausa, index) => {
+                const duracao = formatarTempo(pausa.duracao || 0);
+                pausasHTML += `<li>${index + 1}. ${pausa.motivo || 'Sem motivo'} - Duração: ${duracao} (${new Date(pausa.inicio).toLocaleTimeString()})</li>`;
+            });
+            pausasHTML += '</ul></div>';
+        }
+        
+        return `
+            <div class="card mb-3" id="tarefa-card-${tarefa.id}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">📋 ${tarefa.nome}</h5>
+                    ${estadoBadge[tarefa.estado] || ''}
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tempo Decorrido:</label>
+                            <div class="display-6 text-primary" id="timer-${tarefa.id}">${formatarTempo(tempoTotal)}</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex gap-2 flex-wrap">
+                                ${tarefa.estado === 'rodando' 
+                                    ? `<button type="button" class="btn btn-warning btn-sm" onclick="pausarTarefa('${tarefa.id}')">⏸️ Pausar</button>`
+                                    : tarefa.estado === 'pausado'
+                                    ? `<button type="button" class="btn btn-primary btn-sm" onclick="retomarTarefa('${tarefa.id}')">▶️ Retomar</button>`
+                                    : ''
+                                }
+                                ${tarefa.estado !== 'finalizado'
+                                    ? `<button type="button" class="btn btn-danger btn-sm" onclick="finalizarTarefa('${tarefa.id}')">⏹️ Finalizar</button>`
+                                    : ''
+                                }
+                                <button type="button" class="btn btn-utility btn-sm" onclick="removerTarefa('${tarefa.id}')">🗑️ Remover</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${tarefa.estado === 'pausado' && tarefa.pausaAtual
+                        ? `<div class="mb-3">
+                            <label class="form-label fw-bold">Motivo da Pausa:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="motivo-pausa-${tarefa.id}" 
+                                       placeholder="Ex: Bug encontrado, Aguardando resposta, etc.">
+                                <button type="button" class="btn btn-warning" onclick="confirmarPausa('${tarefa.id}')">✓ Confirmar Pausa</button>
+                            </div>
+                          </div>`
+                        : ''
+                    }
+                    
+                    ${pausasHTML}
+                    
+                    <!-- Informações de Data/Hora -->
+                    <div class="mt-3 pt-3 border-top">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <span class="me-2">📅</span>
+                                    <div>
+                                        <small class="text-muted d-block mb-0"><strong>Data/Hora de Início:</strong></small>
+                                        <span class="text-primary fw-bold">${new Date(tarefa.dataInicio).toLocaleString('pt-BR', { 
+                                            day: '2-digit', 
+                                            month: '2-digit', 
+                                            year: 'numeric', 
+                                            hour: '2-digit', 
+                                            minute: '2-digit', 
+                                            second: '2-digit' 
+                                        })}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <span class="me-2">📅</span>
+                                    <div>
+                                        <small class="text-muted d-block mb-0"><strong>Data/Hora de Término:</strong></small>
+                                        ${tarefa.dataFim 
+                                            ? `<span class="text-primary fw-bold">${new Date(tarefa.dataFim).toLocaleString('pt-BR', { 
+                                                day: '2-digit', 
+                                                month: '2-digit', 
+                                                year: 'numeric', 
+                                                hour: '2-digit', 
+                                                minute: '2-digit', 
+                                                second: '2-digit' 
+                                            })}</span>`
+                                            : `<span class="text-muted">Em andamento...</span>`
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${tarefa.estado === 'finalizado'
+                        ? `<div class="alert alert-info mt-2">
+                            <strong>⏱️ Tempo Total:</strong> ${formatarTempo(tempoTotal)}
+                          </div>`
+                        : ''
+                    }
+                </div>
+            </div>
+        `;
+    }
+    
+    // Função para renderizar todas as tarefas
+    function renderizarTarefas() {
+        const container = document.getElementById('tarefasContainer');
+        const semTarefas = document.getElementById('semTarefasMensagem');
+        const btnLimpar = document.getElementById('btnLimparTarefasFinalizadas');
+        
+        if (tarefas.length === 0) {
+            container.innerHTML = '';
+            if (semTarefas) semTarefas.style.display = 'block';
+            if (btnLimpar) btnLimpar.style.display = 'none';
+            salvarTarefas(); // Salva estado vazio
+            return;
+        }
+        
+        if (semTarefas) semTarefas.style.display = 'none';
+        container.innerHTML = tarefas.map(tarefa => criarHTMLTarefa(tarefa)).join('');
+        
+        // Atualiza botão de limpar tarefas finalizadas
+        const tarefasFinalizadas = tarefas.filter(t => t.estado === 'finalizado');
+        if (btnLimpar) {
+            if (tarefasFinalizadas.length > 0) {
+                btnLimpar.style.display = 'block';
+                btnLimpar.innerHTML = `🗑️ Limpar Tarefas Finalizadas (${tarefasFinalizadas.length})`;
+            } else {
+                btnLimpar.style.display = 'none';
+            }
+        }
+        
+        // Inicia intervalos de atualização para tarefas rodando
+        tarefas.forEach(tarefa => {
+            if (tarefa.estado === 'rodando') {
+                if (!intervalosAtualizacao[tarefa.id]) {
+                    intervalosAtualizacao[tarefa.id] = setInterval(() => {
+                        atualizarTimer(tarefa.id);
+                    }, 1000);
+                }
+            } else {
+                if (intervalosAtualizacao[tarefa.id]) {
+                    clearInterval(intervalosAtualizacao[tarefa.id]);
+                    delete intervalosAtualizacao[tarefa.id];
+                }
+            }
+        });
+        
+        // Salva após renderizar
+        salvarTarefas();
+    }
+    
+    // Função para criar nova tarefa
+    window.criarTarefa = function() {
+        const nomeInput = document.getElementById('novaTarefaNome');
+        const nome = nomeInput.value.trim();
+        
+        if (!nome) {
+            mostrarToast('⚠️ Por favor, informe o nome/número da demanda', 'warning');
+            nomeInput.focus();
+            return;
+        }
+        
+        const novaTarefa = {
+            id: 'tarefa-' + Date.now(),
+            nome: nome,
+            estado: 'rodando',
+            dataInicio: Date.now(),
+            ultimoStart: Date.now(),
+            tempoDecorrido: 0,
+            pausas: [],
+            pausaAtual: null
+        };
+        
+        tarefas.push(novaTarefa);
+        nomeInput.value = '';
+        salvarTarefas();
+        renderizarTarefas();
+        mostrarToast('✓ Tarefa criada e iniciada!', 'success');
+    };
+    
+    // Função para pausar tarefa
+    window.pausarTarefa = function(tarefaId) {
+        const tarefa = tarefas.find(t => t.id === tarefaId);
+        if (!tarefa || tarefa.estado !== 'rodando') return;
+        
+        // Calcula tempo decorrido desde o último start
+        const agora = Date.now();
+        const tempoDecorrido = Math.floor((agora - tarefa.ultimoStart) / 1000);
+        tarefa.tempoDecorrido = (tarefa.tempoDecorrido || 0) + tempoDecorrido;
+        
+        // Inicia pausa (aguardando motivo)
+        tarefa.estado = 'pausado';
+        tarefa.pausaAtual = {
+            inicio: agora,
+            motivo: null
+        };
+        
+        if (intervalosAtualizacao[tarefaId]) {
+            clearInterval(intervalosAtualizacao[tarefaId]);
+            delete intervalosAtualizacao[tarefaId];
+        }
+        
+        salvarTarefas();
+        renderizarTarefas();
+        mostrarToast('⏸️ Tarefa pausada. Informe o motivo da pausa.', 'info');
+    };
+    
+    // Função para confirmar pausa com motivo
+    window.confirmarPausa = function(tarefaId) {
+        const tarefa = tarefas.find(t => t.id === tarefaId);
+        if (!tarefa || !tarefa.pausaAtual) return;
+        
+        const motivoInput = document.getElementById(`motivo-pausa-${tarefaId}`);
+        const motivo = motivoInput ? motivoInput.value.trim() : 'Sem motivo informado';
+        
+        const agora = Date.now();
+        const duracaoPausa = Math.floor((agora - tarefa.pausaAtual.inicio) / 1000);
+        
+        tarefa.pausas.push({
+            inicio: tarefa.pausaAtual.inicio,
+            fim: agora,
+            duracao: duracaoPausa,
+            motivo: motivo || 'Sem motivo informado'
+        });
+        
+        tarefa.pausaAtual = null;
+        salvarTarefas();
+        renderizarTarefas();
+        mostrarToast('✓ Pausa registrada com sucesso!', 'success');
+    };
+    
+    // Função para retomar tarefa
+    window.retomarTarefa = function(tarefaId) {
+        const tarefa = tarefas.find(t => t.id === tarefaId);
+        if (!tarefa || tarefa.estado !== 'pausado') return;
+        
+        // Se havia pausa atual sem confirmar, confirma automaticamente
+        if (tarefa.pausaAtual) {
+            const motivoInput = document.getElementById(`motivo-pausa-${tarefaId}`);
+            const motivo = motivoInput ? motivoInput.value.trim() : 'Sem motivo informado';
+            
+            const agora = Date.now();
+            const duracaoPausa = Math.floor((agora - tarefa.pausaAtual.inicio) / 1000);
+            
+            tarefa.pausas.push({
+                inicio: tarefa.pausaAtual.inicio,
+                fim: agora,
+                duracao: duracaoPausa,
+                motivo: motivo || 'Sem motivo informado'
+            });
+            
+            tarefa.pausaAtual = null;
+        }
+        
+        tarefa.estado = 'rodando';
+        tarefa.ultimoStart = Date.now();
+        
+        salvarTarefas();
+        renderizarTarefas();
+        mostrarToast('▶️ Tarefa retomada!', 'success');
+    };
+    
+    // Função para finalizar tarefa
+    window.finalizarTarefa = function(tarefaId) {
+        const tarefa = tarefas.find(t => t.id === tarefaId);
+        if (!tarefa || tarefa.estado === 'finalizado') return;
+        
+        // Calcula tempo final
+        if (tarefa.estado === 'rodando') {
+            const agora = Date.now();
+            const tempoDecorrido = Math.floor((agora - tarefa.ultimoStart) / 1000);
+            tarefa.tempoDecorrido = (tarefa.tempoDecorrido || 0) + tempoDecorrido;
+        }
+        
+        // Se havia pausa atual sem confirmar, confirma automaticamente
+        if (tarefa.pausaAtual) {
+            const motivoInput = document.getElementById(`motivo-pausa-${tarefaId}`);
+            const motivo = motivoInput ? motivoInput.value.trim() : 'Sem motivo informado';
+            
+            const agora = Date.now();
+            const duracaoPausa = Math.floor((agora - tarefa.pausaAtual.inicio) / 1000);
+            
+            tarefa.pausas.push({
+                inicio: tarefa.pausaAtual.inicio,
+                fim: agora,
+                duracao: duracaoPausa,
+                motivo: motivo || 'Sem motivo informado'
+            });
+            
+            tarefa.pausaAtual = null;
+        }
+        
+        tarefa.estado = 'finalizado';
+        tarefa.dataFim = Date.now();
+        
+        if (intervalosAtualizacao[tarefaId]) {
+            clearInterval(intervalosAtualizacao[tarefaId]);
+            delete intervalosAtualizacao[tarefaId];
+        }
+        
+        salvarTarefas();
+        renderizarTarefas();
+        mostrarToast('⏹️ Tarefa finalizada!', 'success');
+    };
+    
+    // Função para remover tarefa
+    window.removerTarefa = function(tarefaId) {
+        if (!confirm('Tem certeza que deseja remover esta tarefa?')) {
+            return;
+        }
+        
+        tarefas = tarefas.filter(t => t.id !== tarefaId);
+        
+        if (intervalosAtualizacao[tarefaId]) {
+            clearInterval(intervalosAtualizacao[tarefaId]);
+            delete intervalosAtualizacao[tarefaId];
+        }
+        
+        salvarTarefas();
+        renderizarTarefas();
+        mostrarToast('🗑️ Tarefa removida!', 'info');
+    };
+    
+    // Função para limpar tarefas finalizadas
+    window.limparTarefasFinalizadas = function() {
+        const tarefasFinalizadas = tarefas.filter(t => t.estado === 'finalizado');
+        
+        if (tarefasFinalizadas.length === 0) {
+            mostrarToast('ℹ️ Não há tarefas finalizadas para remover.', 'info');
+            return;
+        }
+        
+        if (!confirm(`Tem certeza que deseja remover ${tarefasFinalizadas.length} tarefa(s) finalizada(s)?`)) {
+            return;
+        }
+        
+        // Remove apenas tarefas finalizadas
+        tarefas = tarefas.filter(t => t.estado !== 'finalizado');
+        
+        // Limpa intervalos das tarefas removidas (se houver algum)
+        tarefasFinalizadas.forEach(tarefa => {
+            if (intervalosAtualizacao[tarefa.id]) {
+                clearInterval(intervalosAtualizacao[tarefa.id]);
+                delete intervalosAtualizacao[tarefa.id];
+            }
+        });
+        
+        salvarTarefas();
+        renderizarTarefas();
+        mostrarToast(`🗑️ ${tarefasFinalizadas.length} tarefa(s) finalizada(s) removida(s)!`, 'success');
+    };
+    
+    // Event listener para criar tarefa
+    document.getElementById('btnCriarTarefa').addEventListener('click', criarTarefa);
+    
+    // Event listener para Enter no campo de nome
+    document.getElementById('novaTarefaNome').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            criarTarefa();
+        }
+    });
+    
+    // Event listener para limpar tarefas finalizadas
+    document.getElementById('btnLimparTarefasFinalizadas').addEventListener('click', limparTarefasFinalizadas);
+    
+    // Salva tarefas periodicamente (a cada 30 segundos) para tarefas rodando
+    setInterval(() => {
+        const temTarefasRodando = tarefas.some(t => t.estado === 'rodando');
+        if (temTarefasRodando) {
+            salvarTarefas();
+        }
+    }, 30000); // 30 segundos
+    
+    // Salva antes de fechar/recarregar a página
+    window.addEventListener('beforeunload', () => {
+        salvarTarefas();
+    });
+    
+    // Carrega tarefas do localStorage ao iniciar
+    const carregouTarefas = carregarTarefas();
+    if (carregouTarefas && tarefas.length > 0) {
+        mostrarToast(`✓ ${tarefas.length} tarefa(s) restaurada(s) do último uso!`, 'success');
+    }
+    
+    // Renderiza tarefas ao carregar
+    renderizarTarefas();
 });
 

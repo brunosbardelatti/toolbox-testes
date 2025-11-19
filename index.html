@@ -60,6 +60,9 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="aba-curl-tab" data-bs-toggle="tab" data-bs-target="#aba-curl" type="button" role="tab" aria-controls="aba-curl" aria-selected="false">cURL Tools</button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="aba-timer-tab" data-bs-toggle="tab" data-bs-target="#aba-timer" type="button" role="tab" aria-controls="aba-timer" aria-selected="false">⏱️ Contador de Tempo</button>
+            </li>
         </ul>
 
         <!-- Conteúdo das Abas -->
@@ -973,7 +976,50 @@
                         </div>  
                     </div>  
                 </div>  
-            </div>  
+            </div>
+
+            <!-- Aba: Contador de Tempo -->
+            <div class="tab-pane fade" id="aba-timer" role="tabpanel" aria-labelledby="aba-timer-tab">
+                <h3 class="mb-4">⏱️ Contador de Tempo para Demandas</h3>
+                
+                <!-- Card: Nova Tarefa -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">➕ Nova Tarefa</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="novaTarefaNome" class="form-label fw-bold">Nome/Número da Demanda:</label>
+                                <input type="text" class="form-control" id="novaTarefaNome" 
+                                       placeholder="Ex: DEM-123, Bug #456, Feature X">
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="button" class="btn btn-primary w-100" id="btnCriarTarefa">
+                                    ➕ Criar Tarefa
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botão Limpar Tarefas Finalizadas -->
+                <div class="mb-3 d-flex justify-content-end">
+                    <button type="button" class="btn btn-utility" id="btnLimparTarefasFinalizadas">
+                        🗑️ Limpar Tarefas Finalizadas
+                    </button>
+                </div>
+
+                <!-- Lista de Tarefas Ativas -->
+                <div id="tarefasContainer">
+                    <!-- Tarefas serão adicionadas dinamicamente aqui -->
+                </div>
+
+                <!-- Mensagem quando não há tarefas -->
+                <div id="semTarefasMensagem" class="alert alert-info text-center">
+                    <p class="mb-0">📝 Nenhuma tarefa criada ainda. Crie uma nova tarefa acima para começar a rastrear o tempo.</p>
+                </div>
+            </div>
         </div>
     </div>
 
