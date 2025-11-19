@@ -17,7 +17,9 @@ Esta versão inclui as seguintes alterações e melhorias:
 - 🆕 **Novas Funcionalidades**: 
   - **Gerador Pessoa Física Completa**: Gera dados completos de pessoa física (nome, CPF, RG, endereço completo, filiação, etc.)
   - **Gerador Pessoa Jurídica Completa**: Gera dados completos de pessoa jurídica (razão social, CNPJ, inscrição estadual, endereço completo, responsável legal, etc.)
-  - **Ferramentas cURL**: Executor e gerador de comandos cURL com conversão para Fetch/Axios/XHR
+  - **Ferramentas cURL**: Executor e gerador de comandos cURL com conversão para múltiplos formatos (Fetch, Axios, XHR, Node.js, Playwright, Robot Framework) e suporte a proxy CORS
+  - **Validador XML Fiscal**: Validação completa de documentos fiscais (NFe, NFCe, CT-e, MDF-e, NFS-e, CF-e SAT) com extração de dados e validação de campos obrigatórios
+  - **Contador de Tempo para Demandas**: Sistema completo de rastreamento de tempo para tarefas de QA com múltiplos timers simultâneos, pausas com motivo, histórico completo e persistência em localStorage
 - 📐 **Reorganização de Layout**: 
   - Reorganização da ordem das abas no menu de navegação (Geradores de Dados como primeira aba)
   - Separação dos geradores completos em abas dedicadas
@@ -123,11 +125,13 @@ Profissionais de QA frequentemente enfrentam os seguintes desafios no seu dia a 
 ### Cenários de Uso Comuns
 
 - **Teste de APIs**: Decodificar JWT, formatar JSON, gerar hashes, executar e converter comandos cURL
-- **Validação de Dados**: Validar CPF/CNPJ, testar expressões regulares
-- **Geração de Dados de Teste**: Criar emails, telefones, CPFs, CNPJs válidos
+- **Validação de Dados**: Validar CPF/CNPJ, testar expressões regulares, validar documentos fiscais XML
+- **Geração de Dados de Teste**: Criar emails, telefones, CPFs, CNPJs válidos, dados completos de pessoa física/jurídica
 - **Análise de Respostas**: Comparar respostas de API, formatar payloads, executar requests HTTP
 - **Debug e Troubleshooting**: Decodificar tokens, analisar logs, testar regex, converter cURL para código
-- **Desenvolvimento e Integração**: Converter comandos cURL para Fetch/Axios/XHR, gerar comandos cURL a partir de parâmetros
+- **Desenvolvimento e Integração**: Converter comandos cURL para múltiplos formatos (Playwright, Robot Framework, Node.js, Fetch, Axios, XHR), gerar comandos cURL a partir de parâmetros
+- **Rastreamento de Tempo**: Contabilizar tempo gasto em demandas de teste, registrar pausas com motivo, gerar relatórios de tempo
+- **Validação Fiscal**: Validar documentos fiscais (NFe, NFCe, CT-e, etc.), extrair dados de XMLs fiscais, validar campos obrigatórios
 
 ## ✅ Resultado e Benefícios
 
@@ -351,20 +355,51 @@ A aba Geradores de Dados foi completamente refatorada para melhorar a organizaç
 - Destaca correspondências no texto
 - Tabela detalhada com informações de cada match
 
-### 10. 🔧 Aba cURL Tools *(NOVO)*
+### 10. 📄 Aba Validador XML Fiscal *(NOVO)*
+
+#### Validação de Documentos Fiscais
+- **Suporte a Múltiplos Documentos**: NFe, NFCe, CT-e, MDF-e, NFS-e, CF-e SAT
+- **Validação Completa**: 
+  - Validação de estrutura XML
+  - Validação de campos obrigatórios
+  - Validação de CPF/CNPJ (emitente, destinatário, transportadora)
+  - Validação de chave de acesso
+  - Validação de assinatura digital
+  - Validação de produtos e totais (NFe)
+- **Extração de Dados**:
+  - Dados do documento (tipo, chave, série, número)
+  - Dados do emitente (CNPJ, nome, endereço, IE)
+  - Dados do destinatário (CPF/CNPJ, nome, endereço)
+  - Produtos/Serviços (código, descrição, NCM, CFOP, valores)
+  - Totais (produtos, frete, descontos, impostos, valor total)
+  - Transporte e pagamento
+  - Protocolo de autorização
+- **Exibição de Resultados**:
+  - Status de validação (Válido/Inválido)
+  - Lista de erros encontrados
+  - Lista de avisos
+  - Dados extraídos em formato JSON formatado
+  - Botão para copiar JSON completo
+
+### 11. 🔧 Aba cURL Tools *(NOVO - Atualizado)*
 
 #### Executor de cURL
 - **Validar Estrutura**: Valida e extrai informações do comando cURL (método, URL, headers, body)
 - **Executar Request**: Executa o comando cURL diretamente no navegador
   - Suporta métodos: GET, POST, PUT, DELETE, PATCH
+  - **Proxy CORS**: Opção para usar proxy CORS público e evitar erros de CORS
+  - **Fallback Automático**: Tenta automaticamente com proxy se houver erro de CORS
   - Exibe status HTTP, tempo de resposta e headers da resposta
   - Mostra body da resposta formatado
   - Formatação automática de JSON na resposta
   - Botão para copiar response completa
-- **Converter para Fetch/Axios**: Converte comando cURL para código JavaScript
-  - **Fetch API**: Código usando Fetch API nativa
-  - **Axios**: Código usando biblioteca Axios
-  - **XMLHttpRequest**: Código usando XHR tradicional
+- **Converter Código**: Converte comando cURL para múltiplos formatos
+  - **Playwright**: Código de teste para automação (primeira opção)
+  - **Robot Framework**: Código Robot Framework com RequestsLibrary
+  - **Node.js**: Código usando fetch nativo (Node 18+) e axios como alternativa
+  - **Fetch API**: Código usando Fetch API nativa (browser)
+  - **Axios**: Código usando biblioteca Axios (browser)
+  - **XMLHttpRequest**: Código usando XHR tradicional (browser)
   - Botão de copiar para cada formato
 - **Limpar**: Limpa todos os campos e áreas de resultado
 
@@ -375,12 +410,58 @@ A aba Geradores de Dados foi completamente refatorada para melhorar a organizaç
 - **Body**: Campo para inserir body da requisição (JSON, XML, etc.)
 - **Gerar cURL**: Gera comando cURL completo e formatado
 - **Copiar cURL**: Copia o comando gerado para área de transferência
+- **Limpar**: Limpa todos os campos do gerador
 
 #### Funcionalidades Adicionais
 - **Extração Automática**: Extrai automaticamente método, URL, headers e body de comandos cURL
 - **Visualização de Informações**: Mostra informações extraídas de forma clara
-- **Tratamento de Erros**: Exibe mensagens de erro claras e úteis
-- **Suporte a CORS**: Nota sobre possíveis limitações de CORS ao executar requests
+- **Tratamento de Erros CORS**: Detecta erros de CORS e fornece instruções detalhadas
+- **Proxy CORS Público**: Integração com proxy CORS público (allorigins.win) para contornar restrições
+- **Mensagens de Erro Melhoradas**: Instruções claras sobre como resolver problemas de CORS
+
+### 12. ⏱️ Aba Contador de Tempo para Demandas *(NOVO)*
+
+#### Sistema de Rastreamento de Tempo
+- **Múltiplas Tarefas Simultâneas**: Gerencie várias demandas ao mesmo tempo
+- **Criação de Tarefas**: 
+  - Campo para nome/número da demanda
+  - Tarefa inicia automaticamente ao ser criada
+  - Timer começa a contar imediatamente
+- **Controles de Timer**:
+  - **⏸️ Pausar**: Pausa o timer e solicita motivo da pausa
+  - **▶️ Retomar**: Retoma o timer de onde parou
+  - **⏹️ Finalizar**: Encerra a tarefa e mostra resumo completo
+  - **🗑️ Remover**: Remove tarefa individual (com confirmação)
+- **Campo de Motivo na Pausa**:
+  - Campo de texto para informar motivo (ex: Bug encontrado, Aguardando resposta)
+  - Histórico completo de todas as pausas com motivo e duração
+- **Exibição de Informações**:
+  - **Tempo Decorrido**: Display grande em formato HH:MM:SS
+  - **Data/Hora de Início**: Sempre visível
+  - **Data/Hora de Término**: Visível quando finalizada
+  - **Histórico de Pausas**: Lista todas as pausas com motivo, duração e horário
+  - **Resumo Final**: Tempo total, datas de início e término (quando finalizada)
+- **Persistência**:
+  - **localStorage**: Todas as tarefas são salvas automaticamente
+  - **Restauração Automática**: Tarefas são restauradas ao recarregar a página
+  - **Preservação de Tempo**: Tempo decorrido é preservado corretamente após reload
+  - **Salvamento Automático**: Salva após cada operação e periodicamente (30s)
+- **Limpeza de Tarefas**:
+  - **Limpar Tarefas Finalizadas**: Botão para remover todas as tarefas finalizadas de uma vez
+  - Contador dinâmico mostrando quantas tarefas serão removidas
+  - Botão aparece apenas quando há tarefas finalizadas
+
+#### Estados das Tarefas
+- **▶️ Rodando**: Timer ativo, contando tempo
+- **⏸️ Pausado**: Timer pausado, aguardando motivo ou retomada
+- **⏹️ Finalizado**: Tarefa encerrada, mostrando resumo completo
+
+#### Funcionalidades Técnicas
+- Atualização de tempo em tempo real (a cada segundo)
+- Cálculo preciso considerando pausas
+- Múltiplos timers simultâneos sem interferência
+- Interface responsiva e intuitiva
+- Feedback visual com toasts
 
 ## 📖 Como Usar
 
@@ -432,23 +513,64 @@ A aba Geradores de Dados foi completamente refatorada para melhorar a organizaç
 4. Ou clique em **"Minify / Compactar"** para compactar
 5. Use **"Copiar"** para copiar o resultado
 
+#### Validar XML Fiscal
+
+1. Acesse a aba **"Validador XML Fiscal"**
+2. Cole o XML do documento fiscal no campo de entrada
+3. Clique em **"✅ Validar XML"**
+4. Visualize o resultado:
+   - Tipo de documento identificado
+   - Status de validação (Válido/Inválido)
+   - Lista de erros encontrados (se houver)
+   - Lista de avisos (se houver)
+   - Dados extraídos em formato JSON
+5. Use **"{ } Copiar JSON"** para copiar os dados extraídos
+
 #### Executar e Converter cURL
 
 1. Acesse a aba **"cURL Tools"**
 2. **Para executar um cURL**:
    - Cole o comando cURL no campo
+   - Ative a opção **"Usar Proxy CORS"** (recomendado) para evitar erros de CORS
    - Clique em **"Validar Estrutura"** para verificar
-   - Clique em **"Executar Request"** para fazer a requisição
+   - Clique em **"▶️ Executar Request"** para fazer a requisição
    - Visualize a resposta com status, headers e body
 3. **Para converter cURL**:
    - Cole o comando cURL no campo
-   - Clique em **"Converter para Fetch/Axios"**
-   - Escolha o formato desejado (Fetch, Axios ou XHR)
+   - Clique em **"🔄 Converter Código"**
+   - Escolha o formato desejado:
+     - **Playwright**: Para testes de automação (recomendado para QA)
+     - **Robot Framework**: Para testes com Robot Framework
+     - **Node.js**: Para scripts Node.js
+     - **Fetch API**: Para código browser com Fetch
+     - **Axios**: Para código browser com Axios
+     - **XMLHttpRequest**: Para código browser com XHR
    - Copie o código gerado
 4. **Para gerar um cURL**:
    - Preencha método, URL, headers e body
-   - Clique em **"Gerar cURL"**
+   - Clique em **"✨ Gerar cURL"**
    - Copie o comando gerado
+
+#### Rastrear Tempo de Demandas
+
+1. Acesse a aba **"⏱️ Contador de Tempo"**
+2. **Criar nova tarefa**:
+   - Digite o nome/número da demanda no campo
+   - Clique em **"➕ Criar Tarefa"** ou pressione Enter
+   - O timer inicia automaticamente
+3. **Gerenciar tarefa**:
+   - **Pausar**: Clique em **"⏸️ Pausar"**, informe o motivo e confirme
+   - **Retomar**: Clique em **"▶️ Retomar"** para continuar
+   - **Finalizar**: Clique em **"⏹️ Finalizar"** para encerrar
+   - **Remover**: Clique em **"🗑️ Remover"** para excluir (com confirmação)
+4. **Visualizar informações**:
+   - Tempo decorrido atualizado em tempo real
+   - Data/hora de início e término
+   - Histórico completo de pausas com motivos
+   - Resumo final quando finalizada
+5. **Limpar tarefas antigas**:
+   - Clique em **"🗑️ Limpar Tarefas Finalizadas"** para remover todas as finalizadas
+   - Apenas tarefas finalizadas são removidas, mantendo as ativas
 
 ## 🛠️ Tecnologias Utilizadas
 

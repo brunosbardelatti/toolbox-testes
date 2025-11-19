@@ -3134,7 +3134,138 @@ function mostrarFeedbackBotao(botao, mensagem) {
         });
     }
     
-    // Event listener: Limpar XML
+    // Função para formatar XML (prettify)
+    function formatarXML(xmlString) {
+        try {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+            
+            // Verifica se há erros de parsing
+            const parserError = xmlDoc.querySelector('parsererror');
+            if (parserError) {
+                throw new Error('XML inválido: ' + parserError.textContent);
+            }
+            
+            // Serializa o XML
+            const serializer = new XMLSerializer();
+            let formatted = serializer.serializeToString(xmlDoc);
+            
+            // Remove quebras de linha e espaços extras existentes
+            formatted = formatted.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            formatted = formatted.replace(/>\s+</g, '><');
+            
+            // Adiciona indentação
+            const PADDING = '  '; // 2 espaços
+            const reg = /(>)(<)(\/*)/g;
+            formatted = formatted.replace(reg, '$1\n$2$3');
+            
+            let pad = 0;
+            formatted = formatted.split('\n').map((node) => {
+                let indent = 0;
+                
+                // Tag de fechamento
+                if (node.match(/^<\/\w/)) {
+                    if (pad > 0) {
+                        pad -= 1;
+                    }
+                    indent = 0;
+                }
+                // Tag auto-fechada ou texto
+                else if (node.match(/^<\w[^>]*\/>/) || node.match(/^[^<]/)) {
+                    indent = 0;
+                }
+                // Tag de abertura
+                else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
+                    indent = 1;
+                }
+                
+                pad += indent;
+                
+                const padding = PADDING.repeat(Math.max(0, pad - indent));
+                return padding + node.trim();
+            }).join('\n');
+            
+            return formatted.trim();
+        } catch (error) {
+            throw new Error('Erro ao formatar XML: ' + error.message);
+        }
+    }
+    
+    // Função para compactar XML (minify)
+    function compactarXML(xmlString) {
+        try {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+            
+            // Verifica se há erros de parsing
+            const parserError = xmlDoc.querySelector('parsererror');
+            if (parserError) {
+                throw new Error('XML inválido: ' + parserError.textContent);
+            }
+            
+            // Serializa sem espaços
+            const serializer = new XMLSerializer();
+            let compacted = serializer.serializeToString(xmlDoc);
+            
+            // Remove espaços em branco desnecessários
+            compacted = compacted.replace(/>\s+</g, '><');
+            compacted = compacted.replace(/\s+/g, ' ');
+            compacted = compacted.trim();
+            
+            return compacted;
+        } catch (error) {
+            throw new Error('Erro ao compactar XML: ' + error.message);
+        }
+    }
+    
+    // Event listener para formatar XML
+    const btnFormatarXML = document.getElementById('btnFormatarXML');
+    if (btnFormatarXML) {
+        btnFormatarXML.addEventListener('click', function() {
+            const xmlString = xmlFiscalInput.value.trim();
+            
+            if (!xmlString) {
+                mostrarToast('⚠️ Por favor, cole um XML para formatar', 'warning');
+                xmlFiscalInput.focus();
+                return;
+            }
+            
+            try {
+                const xmlFormatado = formatarXML(xmlString);
+                xmlFiscalInput.value = xmlFormatado;
+                mostrarToast('✓ XML formatado com sucesso!', 'success');
+                xmlFiscalInput.focus();
+            } catch (error) {
+                mostrarToast('❌ ' + error.message, 'error');
+                console.error('Erro ao formatar XML:', error);
+            }
+        });
+    }
+    
+    // Event listener para compactar XML
+    const btnCompactarXML = document.getElementById('btnCompactarXML');
+    if (btnCompactarXML) {
+        btnCompactarXML.addEventListener('click', function() {
+            const xmlString = xmlFiscalInput.value.trim();
+            
+            if (!xmlString) {
+                mostrarToast('⚠️ Por favor, cole um XML para compactar', 'warning');
+                xmlFiscalInput.focus();
+                return;
+            }
+            
+            try {
+                const xmlCompactado = compactarXML(xmlString);
+                xmlFiscalInput.value = xmlCompactado;
+                mostrarToast('✓ XML compactado com sucesso!', 'success');
+                xmlFiscalInput.focus();
+            } catch (error) {
+                mostrarToast('❌ ' + error.message, 'error');
+                console.error('Erro ao compactar XML:', error);
+            }
+        });
+    }
+    
     if (btnLimparXML) {
         btnLimparXML.addEventListener('click', function() {
             // Limpar textarea de entrada
