@@ -114,6 +114,29 @@ document.addEventListener('DOMContentLoaded', function() {
         base64Output.value = temp;
     });
 
+    // Copiar Input Base64
+    const btnBase64CopyInput = document.getElementById('btnBase64CopyInput');
+    btnBase64CopyInput.addEventListener('click', function() {
+        base64Input.select();
+        document.execCommand('copy');
+        mostrarFeedbackCopiar(btnBase64CopyInput);
+    });
+
+    // Copiar Output Base64
+    const btnBase64CopyOutput = document.getElementById('btnBase64CopyOutput');
+    btnBase64CopyOutput.addEventListener('click', function() {
+        base64Output.select();
+        document.execCommand('copy');
+        mostrarFeedbackCopiar(btnBase64CopyOutput);
+    });
+
+    // Limpar campos Base64
+    const btnBase64Clear = document.getElementById('btnBase64Clear');
+    btnBase64Clear.addEventListener('click', function() {
+        base64Input.value = '';
+        base64Output.value = '';
+    });
+
     // ============================================
     // ABA: ENCODERS/DECODERS - URL
     // ============================================
@@ -142,6 +165,29 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (erro) {
             alert('Erro ao decodificar. Verifique se o texto é uma URL codificada válida.');
         }
+    });
+
+    // Copiar Input URL
+    const btnUrlCopyInput = document.getElementById('btnUrlCopyInput');
+    btnUrlCopyInput.addEventListener('click', function() {
+        urlInput.select();
+        document.execCommand('copy');
+        mostrarFeedbackCopiar(btnUrlCopyInput);
+    });
+
+    // Copiar Output URL
+    const btnUrlCopyOutput = document.getElementById('btnUrlCopyOutput');
+    btnUrlCopyOutput.addEventListener('click', function() {
+        urlOutput.select();
+        document.execCommand('copy');
+        mostrarFeedbackCopiar(btnUrlCopyOutput);
+    });
+
+    // Limpar campos URL
+    const btnUrlClear = document.getElementById('btnUrlClear');
+    btnUrlClear.addEventListener('click', function() {
+        urlInput.value = '';
+        urlOutput.value = '';
     });
 
     // ============================================
@@ -1314,12 +1360,25 @@ function mostrarFeedbackBotao(botao, mensagem) {
                 // Caso contrário, mantém GET como padrão
             }
             
-            // Extrai URL (primeira string após aspas ou primeira palavra sem -)  
-            const urlMatch = cmd.match(/(?:curl\s+)?(?:-X\s+\w+\s+)?['"]?([^\s'"]+)/i) ||   
-                            cmd.match(/(?:^|\s)(?!-)(https?:\/\/[^\s'"]+)/i);  
-            if (urlMatch) {  
-                result.url = urlMatch[1] || urlMatch[0];  
-                result.url = result.url.replace(/^['"]|['"]$/g, '');  
+            // Extrai URL - procura especificamente por URLs (http:// ou https://)
+            // Isso garante que flags como --location, -L, -v, etc. não sejam confundidas com URLs
+            let urlMatch = null;
+            
+            // Primeiro tenta encontrar URL entre aspas (simples ou duplas)
+            // Procura por aspas contendo https:// ou http://
+            urlMatch = cmd.match(/['"](https?:\/\/[^'"]+)['"]/i);
+            if (!urlMatch) {
+                // Se não encontrou entre aspas, procura diretamente por http:// ou https://
+                // Para no primeiro espaço, quebra de linha ou flag (que começa com -)
+                urlMatch = cmd.match(/(https?:\/\/[^\s'"]+)/i);
+            }
+            
+            if (urlMatch) {
+                result.url = urlMatch[1] || urlMatch[0];
+                // Remove aspas do início e fim se houver (caso a regex tenha capturado)
+                result.url = result.url.replace(/^['"]+|['"]+$/g, '');
+                // Remove espaços extras
+                result.url = result.url.trim();
             }
             
             // Extrai headers  
@@ -1335,10 +1394,25 @@ function mostrarFeedbackBotao(botao, mensagem) {
                 }  
             }
             
-            // Extrai body (-d ou --data)  
-            const bodyMatch = cmd.match(/(?:-d|--data|--data-raw)\s+['"](.+?)['"]/i);  
-            if (bodyMatch) {  
-                result.body = bodyMatch[1];  
+            // Extrai body (-d, --data, --data-raw, --data-binary, --data-ascii)
+            // Procura por flags de data seguidas de conteúdo
+            let bodyMatch = null;
+            
+            // Primeiro tenta com aspas simples
+            bodyMatch = cmd.match(/(?:-d|--data|--data-raw|--data-binary|--data-ascii)\s+'([^']+)'/i);
+            if (!bodyMatch) {
+                // Tenta com aspas duplas
+                bodyMatch = cmd.match(/(?:-d|--data|--data-raw|--data-binary|--data-ascii)\s+"([^"]+)"/i);
+            }
+            if (!bodyMatch) {
+                // Tenta sem aspas (para dados simples até o próximo espaço ou flag)
+                bodyMatch = cmd.match(/(?:-d|--data|--data-raw|--data-binary|--data-ascii)\s+([^\s-]+)/i);
+            }
+            
+            if (bodyMatch) {
+                result.body = bodyMatch[1];
+                // Remove espaços extras no início e fim
+                result.body = result.body.trim();
                 // Tenta fazer parse se for JSON  
                 try {  
                     result.body = JSON.parse(result.body);  
@@ -3279,6 +3353,24 @@ function mostrarFeedbackBotao(botao, mensagem) {
                 mostrarToast('❌ ' + error.message, 'error');
                 console.error('Erro ao compactar XML:', error);
             }
+        });
+    }
+    
+    // Event listener: Copiar XML
+    const btnCopiarXML = document.getElementById('btnCopiarXML');
+    if (btnCopiarXML) {
+        btnCopiarXML.addEventListener('click', function() {
+            const xmlText = xmlFiscalInput.value.trim();
+            
+            if (!xmlText) {
+                mostrarToast('⚠️ Não há XML para copiar', 'warning');
+                return;
+            }
+            
+            // Seleciona e copia o texto
+            xmlFiscalInput.select();
+            document.execCommand('copy');
+            mostrarFeedbackCopiar(btnCopiarXML);
         });
     }
     
