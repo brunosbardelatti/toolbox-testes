@@ -1292,10 +1292,26 @@ function mostrarFeedbackBotao(botao, mensagem) {
                 body: null  
             };
             
-            // Extrai método  
-            const methodMatch = cmd.match(/-X\s+(\w+)/i);  
-            if (methodMatch) {  
-                result.method = methodMatch[1].toUpperCase();  
+            // Extrai método HTTP
+            // Procura por -X ou --request seguido do método (com ou sem aspas)
+            let methodMatch = cmd.match(/(?:-X|--request)[\s=]+['"]?(\w+)['"]?/i);
+            if (!methodMatch) {
+                // Tenta também com espaços extras ou quebras de linha
+                methodMatch = cmd.match(/(?:-X|--request)[\s=]+(\w+)/i);
+            }
+            if (methodMatch) {
+                result.method = methodMatch[1].toUpperCase();
+            } else {
+                // Se não encontrou método explícito, verifica se há body
+                // Se houver body (-d ou --data) e não houver --get, assume POST
+                const hasBody = /(?:-d|--data|--data-raw|--data-binary|--data-ascii)/i.test(cmd);
+                const hasGetFlag = /--get/i.test(cmd);
+                
+                if (hasBody && !hasGetFlag) {
+                    // Se tem body e não tem --get, provavelmente é POST
+                    result.method = 'POST';
+                }
+                // Caso contrário, mantém GET como padrão
             }
             
             // Extrai URL (primeira string após aspas ou primeira palavra sem -)  
